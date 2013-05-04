@@ -1,0 +1,101 @@
+# ChangeLog for elogv
+
+2009-07-13 Luca Marturana <lucamarturana@gmail.com>
+	* elogv: fixed bug #262966 on Gentoo Bugzilla, thanks to Davide Pesavento <davidepesa@gmail.com> for reporting and Michael A. Smith <michael@smith-li.com> for the patch
+	* setup.py: bump to version 0.7.4
+
+2008-12-07 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: fixed bug #249536 on Gentoo Bugzilla, there was a problem when
+	using the dd command, thanks to Arnaud Lech <arnaud@bdefracte.org> for the
+	patch
+    
+2008-11-01 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: fixed bug #236056 on Gentoo Bugzilla, now elogv works fine even
+	if the terminal has a black background
+	* setup.py: Bump to version 0.7.3
+
+2008-10-18 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: adding patch to display long lines (wrapped), thanks to Douglas
+	Anderson <douglasjanderson@gmail.com>
+
+2008-06-01 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Little problem on show_log when the traslation of "Continue..."
+	has more than 11 chars.
+
+2008-05-23 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Changed *.clear() with *.erase(), reducing flickering. Also
+	added vim modeline, removed trailing spaces from empty lines and other
+	minor changes. Thanks to Michał Kiedrowicz <esqualante@o2.pl> for the
+	patch.
+
+2008-05-20 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Fixed bug when deleting files from start (ds), thanks to
+	Michał Kiedrowicz <esqualante@o2.pl> for the patch
+
+2008-05-16 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Fixed various bugs and added new shortcuts, updated transalations
+	and man pages
+
+2008-03-31 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Added localization support ( thanks to Michał Kiedrowicz
+	<esqualante@o2.pl> and Christian Faulhammer <opfer@gentoo.org> for the
+	German translation), other varius improvements on the code, now the
+	list of files can be ordered by class warning level
+	* setup.py: Added support to install *.po files and localized manpages
+
+2008-03-21 Luca Marturana (luca89) <lucamarturana@gmail.com> 
+	* elogv: Fixed bug #214063 on Gentoo Bugzilla, thanks to Michał Kiedrowicz 
+	<esqualante@o2.pl> 
+
+2008-03-05 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Tagging files with the alarm level, thanks to
+	Michał Kiedrowicz <esqualante@o2.pl> for the idea and implementation
+
+2008-02-11 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Fixed bug on reordering the list of files and fixed wrong j/k keys
+	thanks to Michał Kiedrowicz <esqualante@o2.pl>
+
+2008-02-05 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* Makefile: removed
+	* setup.py: Now use distutils
+	* elogv.py: Fixed bug #195429 on Gentoo Bugzilla and #1800105 on SF.net
+	tracker, thanks to Christian Faulhammer <opfer@gentoo.org> and Michał
+	Kiedrowicz <esqualante@o2.pl>
+	* INSTALL: updated for distutils
+
+2007-09-16 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* Makefile: Release 0.6.1
+	* elogv.py: Fixed bug #187595 on Gentoo Bugzilla
+
+2007-06-06 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* Makefile: Release 0.6
+
+2007-05-13 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv.py: don't display version on the in-line help
+	* Makefile: applying version of the package to elogv.py isn't required
+	anymore
+	* INSTALL: added basic installation istructions
+
+2007-05-13 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv.1: Added REPORTING BUGS section
+	* Makefile: Added a Makefile
+	* makedist.sh: Removed, now we will use the Makefile
+
+2007-05-12 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv.1: Added manpage
+	* elogv.py: little performance improvements
+
+2007-05-09 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv.py: new search support
+
+2007-01-29 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* makedist.sh: generate md5 and sign the tarball with gpg
+
+2007-01-02 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv.py: better fix for previous bug
+
+2006-12-14 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* ChangeLog: new format
+	* ChangeLog.old: old ChangeLog saved here
+	* elogv.py: fixed bug when removing the last entry of the list, thanks Scen
+	            for reporting

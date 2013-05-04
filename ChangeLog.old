@@ -1,0 +1,50 @@
+0.1:
+	First public version
+
+0.1.1:
+	Added a README
+	Added same checks on elog dir
+	Added a ChangeLog
+
+0.2:
+	Fixed bug on scrolling the list
+	Fixed a bug on the file_view window
+	Improved performance (refresh() method used to were called too times)
+	Added Known problems on README
+	Fixed a bug on sort_by_date function
+	Added COPYING
+	Now use errno module for exit codes
+	Now support the resize of the terminal
+
+0.3:
+	Added an inline help screen
+	Little improvement on scrolling of the list
+
+0.3.1:
+	Little fixes on help screen
+	The program exit if the terminal window is too small
+
+0.4:
+	New feature, logfile can be also removed using elogv
+	Modified help screen method
+	Fixed little bug on show_log function
+	Other little fixies and code improvements
+
+0.4.1:
+	Required columns now are >=80 instead >=118
+	Fixed bug on loading files
+
+0.4.2:
+	Little changes on "d" command
+	Now truncate messages that excedees the number of cols (preventing a crash
+	of the program)
+	"re" module is no longer used
+
+0.5:
+	Help screen now is scrollable and more usable
+	New key "r" to reverse the order of the file list
+	Now files will be showed automatically, to scroll can be used the Space
+	bar, Thanks to Wolf Giesen <frilled@gentoo.org>
+
+0.5.1:
+	Catching Ctrl+C and exit fine
