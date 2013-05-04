@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.5 2010-04-26 Luca Marturana <lucamarturana@gmail.com>
+  * Added spanish translation
+
 2009-07-13 Luca Marturana <lucamarturana@gmail.com>
 	* elogv: fixed bug #262966 on Gentoo Bugzilla, thanks to Davide Pesavento <davidepesa@gmail.com> for reporting and Michael A. Smith <michael@smith-li.com> for the patch
 	* setup.py: bump to version 0.7.4
