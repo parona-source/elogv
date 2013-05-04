@@ -1,0 +1,86 @@
+.TH ELOGV "1" "May 2008" "User Commands"
+.SH NAME
+elogv \- elog viewer
+.SH DESCRIPTION
+Elogv is a portage elog viewer based on curses and python.
+.SH USAGE
+You can use these keys to control the behavior of the program:
+.TP
+.B "Down arrow" or "j"
+Scroll the list of files down by 1 unit
+.TP
+.B "Up arrow" or "k"
+opposite of Down arrow
+.TP
+.B "PagDown"
+Scroll the list down by 10 unit
+.TP
+.B "PagUp"
+opposite of Pag Down
+.TP
+.B End
+Go to the last file of the list
+.TP
+.B Home
+Go to the first file of the list
+.TP
+.B t
+order the list of files by date, most recent on top
+.TP
+.B a
+order the list of files alphabetically, the first time by category, the second
+time (pressing the key again) by package name
+.TP
+.B c
+order the list of files by log class warning level
+.TP
+.B r
+reverse the list of files
+.TP
+.B SpaceBar
+scroll the selected file
+.TP
+.B  h or F1
+show the help screen, press Page Up/Down to scroll up and down, h and F1 again to hide
+.TP
+.B d
+removes selected files, usage is similar to vim "d" command, here are same examples:
+.RS
+.TP
+.I da
+removes all files
+.TP
+.I de
+removes from selected item to the end of the list
+.TP
+.I ds
+remove from selected item to the start of the list
+.TP
+.I "d1d or dd"
+removes selected file only
+.TP
+.I d4d
+removes 4 files starting from selected one
+.RE
+.TP
+.B /
+starts a search prompt, write a string and will be showed the next package that contains your string, use ESC to exit
+.TP
+.B q
+quit
+.SH NOTES
+To use this software you need the portage elog system configured on your
+/etc/make.conf, this is a simply configuration:
+
+.nf
+# Logging
+PORTAGE_ELOG_CLASSES="warn error log"
+PORTAGE_ELOG_SYSTEM="save"
+.TP
+For other details see /etc/make.conf.example
+.SH "REPORTING BUGS"
+Report your bugs to our sourceforge tracker:
+.P
+http://sourceforge.net/tracker/?group_id=176946
+.SH AUTHOR
+Luca Marturana (luca89) <lucamarturana@gmail.com>

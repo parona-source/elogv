@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: elogv
+Version: 0.7.5
+Summary: Curses based utility to view elogs created by Portage
+Home-page: http://gechi-overlay.sourceforge.net/?page=elogv
+Author: Luca Marturana
+Author-email: lucamarturana@gmail.com
+License: GPL-2
+Description: UNKNOWN
+Platform: UNKNOWN

@@ -1,0 +1,574 @@
+#!/usr/bin/python
+# Author: Luca Marturana (luca89) <lucamarturana@gmail.com>
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+import os
+import sys
+import re
+from datetime import datetime
+import curses
+import curses.ascii
+import textwrap
+from portage import settings as port_settings
+from glob import glob
+import gettext
+import locale
+
+# Setup default locale
+locale.setlocale(locale.LC_ALL, '')
+
+# Setup gettext. Note that lgettext() is used instead of gettext()
+# because it always returns strings encoded with the preferred system
+# encoding, not encoded with the same codeset used in the translation
+# file
+gettext.textdomain('elogv')
+_ = gettext.lgettext
+
+# This text is used on the in-line help
+helptext = _("""
+Elogv is a portage elog viewer based on curses and python,
+you can use these keys to control the behavior of the program:
+
+ - Down arrow or j -> scroll the list of files down by 1 unit
+ - Up arrow or k -> opposite of Down arrow
+ - PageDown -> scroll the list down by 10 unit
+ - PageUp -> opposite of PageDown
+ - End -> go to the last file of the list
+ - Home -> go to the first file of the list
+ - t -> order the list of files by date, most recent on top
+ - a -> order the list of files alphabetically, the first time by category,
+        the second time (pressing the key again) by package name
+ - c -> order the list of files by log class warning level
+ - r -> reverse the list of files
+ - SpaceBar -> scroll the selected file
+ - h or F1 -> show the help screen, press Page Up/Down to scroll up and down,
+              h or F1 again to hide
+ - d -> removes selected files, usage is similar to vim "d" command,
+        here are same examples:
+            da -> removes all files
+            de -> removes from selected item to the end of the list
+            ds -> remove from selected item to the start of the list
+            d1d or dd -> removes selected file only
+            d4d -> removes 4 files starting from selected one
+ - / -> starts a search prompt, write a string and will be showed the next
+        package that contains your string, use ESC to exit
+ - q -> quit
+""")
+
+(normal, selected, einfo, elog, ewarn, eerror) = range(6)
+(PATH, CAT, PN, DATE, CLASS) = range(5)
+
+# Character used to print the class of an elog
+class_char = "*"
+list_format = "%s/%s - %s"
+date_format = "%x"
+
+# Exceptions classes
+class TermTooSmall(Exception):
+    def __init__(self):
+        pass
+
+class NoLogFiles(Exception):
+    def __init__(self):
+        pass
+
+class CannotOpenElogdir(Exception):
+    def __init__(self):
+        pass
+
+# Main class (called with curses.wrapper later)
+class ElogViewer:
+    def __init__(self, screen):
+        #curses.curs_set(0)
+        self.screen = screen
+
+        # Our color pairs
+        curses.use_default_colors()
+        curses.init_pair(selected, curses.COLOR_BLACK, curses.COLOR_WHITE)
+        curses.init_pair(einfo, curses.COLOR_GREEN, curses.COLOR_BLACK)
+        curses.init_pair(ewarn, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+        curses.init_pair(eerror, curses.COLOR_RED, curses.COLOR_BLACK)
+        curses.init_pair(elog, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+
+        # This attributes are used to manage the scrolling of the list
+        # of files    
+        self.pposy = 0
+        self.usel = 0
+
+        # Method used to order the list: use DATE for order by date, CAT to
+        # order by category name, PN to order by package name, CLASS to order
+        # by class second value set if the list should be reversed (True o False)
+        self.sort_method = [ DATE, False]
+
+        # Initialize screen
+        self.init_screen()
+
+        c = self.screen.getch()
+        while c not in ( ord("q"), curses.ascii.ESC):
+            ## Scrolling keys ##
+            if c in (curses.KEY_DOWN, ord("j")):
+                self.change_usel(1)
+
+            elif c in (curses.KEY_UP, ord("k")):
+                self.change_usel(-1)
+
+            elif c in (curses.KEY_NPAGE, ord("f")):
+                self.change_usel(10)
+                
+            elif c in (curses.KEY_PPAGE, ord("b")):
+                self.change_usel(-10)
+
+            elif c in (curses.KEY_END, ord("G")):
+                self.change_usel(len(self.packages)-1, False)
+
+            elif c in (curses.KEY_HOME, ord("g")):
+                self.change_usel(0, False)
+            ## End Scrolling keys ##
+
+            ## Sorting the list ##
+            elif c == ord("a"):
+                if self.sort_method[0] == CAT:
+                    self.sort_method[0] = PN
+                else:
+                    self.sort_method[0] = CAT
+                self.fill_file_pad()
+                self.refresh_file_pad()
+
+            elif c == ord("t"):
+                self.sort_method[0] = DATE
+                self.fill_file_pad()
+                self.refresh_file_pad()
+
+            elif c == ord("c"):
+                self.sort_method[0] = CLASS
+                self.fill_file_pad()
+                self.refresh_file_pad()
+
+            elif c == ord("r"):
+                self.sort_method[1] = not self.sort_method[1]
+                self.fill_file_pad()
+                self.refresh_file_pad()
+            ## End Sorting the list ##
+
+            elif c == ord(" "):
+                # Now is used only for scrolling the text
+                self.show_log()
+
+            elif c == curses.KEY_RESIZE:
+                # Reinitialize screen
+                self.init_screen()
+
+            elif c in (curses.KEY_F1, ord("h")):
+                self.show_help()
+                # We need to reinitialize the screen
+                self.init_screen()
+
+            elif c == ord("d"):
+                subc = self.screen.getch()
+                if subc == ord("a"):
+                    n = "all"
+                elif subc == ord("e"):
+                    n = "end"
+                elif subc == ord("s"):
+                    n = "start"
+                elif subc == ord("d"):
+                    n = "1"
+                else:
+                    n = ""
+                    while curses.ascii.isdigit(subc):
+                        n += chr(subc)
+                        subc = self.screen.getch()
+                if n:
+                    self.remove_file(n)
+                    self.file_pad.erase()
+                    self.refresh_file_pad()
+                    # If the user deleted files to start, move the selection
+                    # to the first item
+                    if n == "start":
+                        self.usel = 0
+                        self.pposy = 0
+                    self.fill_file_pad()
+                    self.refresh_file_pad()
+                    self.logf_wrap = self.wrap_logf_lines()
+                    self.show_log()
+
+            elif c == ord("/"):
+                word = ""
+                self.screen.move(self.height-1,2)
+                self.screen.addstr("/")
+                subc = self.screen.getch()
+                while subc != curses.ascii.ESC:
+                    if subc == ord("\n"):
+                        self.search(word,1)
+                    elif subc == curses.ascii.BS:
+                        word = word[:-1]
+                        self.screen.delch()
+                        self.search(word)
+                    elif curses.ascii.isalpha(subc):
+                        word += chr(subc)
+                        self.screen.addstr(chr(subc))
+                        self.search(word)  
+                    subc = self.screen.getch()
+                self.screen.hline(self.height-1,2,curses.ACS_HLINE,(len(word)+1))
+                self.screen.addstr(self.height-2,2," "*20)
+
+            # Get another key from the user
+            c = self.screen.getch()
+
+    def init_screen(self):
+        """
+        Init the screen and wins, it's also used to reinizialize screen
+        after a terminal resizing
+        """
+        (self.height, self.width) = self.screen.getmaxyx()
+
+        # Check if the terminal window is too small
+        if self.height < 12 or self.width < 80:
+            raise TermTooSmall()
+
+        # Screen Look&Feel
+        self.screen.border()
+        self.screen.hline(self.height//2,1, "_", self.width-2)
+        m = _(" Press F1 or h to show the help screen ")
+        self.screen.addstr(self.height-1, self.width-len(m)-1, m)
+        self.screen.refresh()
+
+        # Initialize log file window
+        self.log_win = curses.newwin(self.height//2-2, self.width-2,
+                                     self.height//2+1, 1)
+
+        # Draw other window of the screen
+        self.fill_file_pad()
+        self.refresh_file_pad()
+
+        self.logf_wrap = self.wrap_logf_lines()
+        self.show_log()
+
+    def change_usel(self,n,relative=True):
+        prev_usel = self.usel
+        if not relative:
+            self.usel = n
+        elif n < 0 and self.usel+n < 0:
+            self.usel = 0
+        elif n > 0 and self.usel+n > len(self.packages)-1:
+            self.usel = len(self.packages)-1
+        else:
+            self.usel += n
+
+        prev_pkg = self.packages[prev_usel]
+        pkg = self.packages[self.usel]
+        self.file_pad.addstr(prev_usel,1,
+                                 class_char,
+                                 curses.A_BOLD + curses.color_pair(prev_pkg[CLASS]))
+        self.file_pad.addstr(prev_usel,3,
+                                 list_format % (prev_pkg[CAT], prev_pkg[PN], prev_pkg[DATE].strftime(date_format) ),
+                                 curses.color_pair(normal))
+        self.file_pad.addstr(self.usel,1,
+                                 class_char,
+                                 curses.A_BOLD + curses.color_pair(pkg[CLASS]))
+        self.file_pad.addstr(self.usel,3,
+                                 list_format % (pkg[CAT], pkg[PN], pkg[DATE].strftime(date_format) ),
+                                 curses.color_pair(selected))
+
+        first = self.pposy
+        last = (self.height / 2 - 2) + first
+
+        if self.usel < first:
+            self.pposy -= first - self.usel
+
+        if self.usel > last:
+            self.pposy += self.usel - last
+        self.refresh_file_pad()
+        self.logf.close()
+        try:
+            self.logf = open(pkg[PATH])
+        except IOError:
+            # print ("Logfile not found at '%s'. Did it get deleted somehow?"
+            #     % os.path.join(elogdir,pkg[PATH]))
+            self.init_screen()
+            self.change_usel(prev_usel, False)
+        self.logf_wrap = self.wrap_logf_lines()
+        self.show_log()
+
+    def refresh_file_pad(self):
+        """
+        Redraws file pad, first half of the screen.
+        Can be used to scroll or simply update
+        """
+        self.file_pad.refresh(self.pposy,0,1,1,self.height//2-1,self.width-2)
+
+    def get_packages_key(self, k):
+        return k[self.sort_method[0]]
+
+    def fill_file_pad(self):
+        """
+        Fill the list of files, colorize the selected row and order files by
+        method specified
+        """
+        # Get the list of files
+        try:
+            file_list = glob(os.path.join(elogdir,"*:*:*.log")) + glob(os.path.join(elogdir,"*","*:*.log"))
+        except OSError:
+            raise CannotOpenElogdir()
+
+        if not file_list:
+            raise NoLogFiles()
+
+        # self.packages contains all info extracted from each file, this is the
+        # structure:
+        # [ ("filename", "category", "package name", date:datetime_obj, class:int), ... ]
+        self.packages = []
+        for filepath in file_list:
+            # This istruction splits the information about the package from the file path
+            # If the user don't use split-elog feature the format used by portage is:
+            # <elogdir>/x11-themes:haematite-xcursors-1.0:20091018-195827.log
+            # else with the split-elog feature:
+            # <elogdir>/x11-themes/haematite-xcursors-1.0:20091018-195827.log
+            # So first we remove the elogdir from the filepath to obtain
+            # x11-themes:haematite-xcursors-1.0:20091018-195827.log
+            # or
+            # x11-themes/haematite-xcursors-1.0:20091018-195827.log
+            # then we split the string using as pattern / or : to obtain in any
+            # case
+            # ( "x11-themes", "haematite-xcursors", "1.0:20091018-195827.log")
+            (cat,pn,other) = re.split(":|" + os.path.sep, filepath.replace(elogdir + os.path.sep, "") )
+            if sys.version_info[:2] >= (2, 5):
+                date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
+            else:
+                # This is for backward compatibility with older version of python
+                # it will be removed in the future
+                date_str = other[:8]
+                date = datetime(int(date_str[:4]),int(date_str[4:6]),int(date_str[6:]))
+            self.packages.append( (filepath, cat, pn, date, self.get_class(filepath)) )
+
+        # Maybe that after removing files self.usel points to a wrong index,
+        # so this will prevent a crash
+        if self.usel >= len(self.packages):
+            self.usel = len(self.packages)-1
+            # We also have to update self.pposy
+            if self.pposy > self.usel:
+                self.pposy = max(0, self.usel-10)
+
+        # Sort the list
+        if self.sort_method[0] in (DATE, CLASS):
+            self.packages.sort(key=self.get_packages_key,reverse=not self.sort_method[1])
+        else:
+            self.packages.sort(key=self.get_packages_key, reverse=self.sort_method[1])
+
+        self.file_pad = curses.newpad(len(self.packages),self.width)
+        self.file_pad.erase()
+
+        for i in range(len(self.packages)):
+            pkg = self.packages[i]
+            if i == self.usel:
+                cp = selected
+                # Maybe that the logf pointed by self.usel changed, (example
+                # when same files are removed) so reload the self.logf file
+                # pointer, this work is done here for convenience
+                try:
+                    self.logf.close()
+                except AttributeError:
+                    pass
+                self.logf = open(pkg[PATH])
+            else:
+                cp = normal
+
+            self.file_pad.addstr(i,1,
+                                 class_char,
+                                 curses.A_BOLD + curses.color_pair(pkg[CLASS]))
+            self.file_pad.addstr(i,3,
+                                 list_format % (pkg[CAT], pkg[PN], pkg[DATE].strftime(date_format) ),
+                                 curses.color_pair(cp))
+
+    def get_class(self,filepath):
+        """
+        Get the highest elog class in a file
+        """
+        f = file(filepath)
+
+        classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
+        f.close()
+
+        if "ERROR:" in classes:
+            return eerror
+        elif "WARN:" in classes:
+            return ewarn
+        elif "LOG:" in classes:
+            return elog
+        else:
+            return einfo
+
+    def wrap_logf_lines(self):
+        """
+        Takes a file-like object and wraps long lines. Returns a list iterator.
+        """
+        result = []
+        self.logf.seek(0)
+        logf = self.logf.readlines()
+        for line in logf:
+            if not line.strip():
+                # textwrap eats newlines
+                result.append("\n")
+            else:
+                # Returns a list of new lines minus the line ending \n
+                wrapped_line = textwrap.wrap(line, width=self.width-2)
+                for l in wrapped_line:
+                    l += "\n" 
+                    result.append(l)
+
+        return iter(result)
+
+    def show_log(self):
+        """
+        Display the selected file, if the length of the file is bigger than
+        the height of the window, interrupt the drawing and resume it when the
+        user press again the SpaceBar key
+        """
+        self.log_win.erase()
+        shown_all = False
+
+        for i in range(0,self.height//2-4):
+            try:
+                x = self.logf_wrap.next()
+            except StopIteration:
+                shown_all = True
+                # Restart the iterator
+                self.logf_wrap = self.wrap_logf_lines()
+                break
+
+            try:
+                if x.startswith('INFO:'):
+                    self.log_win.addstr(x[:self.width-2],curses.color_pair(einfo))
+                elif x.startswith('WARN:'):
+                    self.log_win.addstr(x[:self.width-2],curses.color_pair(ewarn))
+                elif x.startswith('ERROR:'):
+                    self.log_win.addstr(x[:self.width-2],curses.color_pair(eerror))
+                elif x.startswith('LOG:'):
+                    self.log_win.addstr(x[:self.width-2],curses.color_pair(elog))
+                else:
+                    self.log_win.addstr(x[:self.width-2],curses.color_pair(normal))
+            except curses.error:
+                pass
+
+        if not shown_all: 
+            s = _("Continue...")
+            self.log_win.addstr(self.height//2-3, self.width-len(s)-4, s,
+                                curses.color_pair(normal))
+
+        self.log_win.refresh()
+
+    def remove_file(self,n):
+        """
+        Delete from the filesystem a slice of elog files
+        n can be:
+        "all" -> all files will be deleted
+        "end" -> files from selected one to the end of the list will be deleted
+        <int> -> will be deleted the selected file and the next <int>-1
+        """
+
+        if n == "all":
+            start = None
+            end = None
+        elif n == "end":
+            start = self.usel
+            end = None
+        elif n == "start":
+            start = None
+            end = self.usel
+        else:
+            start = self.usel
+            end = self.usel + int(n)
+
+        for item in self.packages[start:end]:
+            os.remove(os.path.join(elogdir,item[0]))
+
+    def show_help(self):
+        # Setup help window
+        helpwin_height = self.height / 3 * 2
+        helpwin_corner = (self.height / 6, self.width// 2 - 40)
+        helpwin = curses.newwin(helpwin_height, 80,
+                                     helpwin_corner[0], helpwin_corner[1])
+        helplines = helptext.splitlines()
+
+        # Setup help pad
+        row = 0
+        maxrow = len(helplines)
+        helppad = curses.newpad(maxrow,80)
+
+        # Insert helptext on the pad
+        for i in range(maxrow):
+            helppad.addstr(i,0,helplines[i])
+
+        # Loop to manage user actions
+        c = None
+        while c not in (ord("h"), curses.KEY_F1, ord("q")):
+            helpwin.erase()
+            helpwin.border()
+            helpwin.refresh()
+
+            helppad.refresh(row,0,helpwin_corner[0]+1,helpwin_corner[1]+1,
+                             helpwin_height+helpwin_corner[0]-2,80+helpwin_corner[1]-2)
+
+            c = self.screen.getch()
+            if c == curses.KEY_NPAGE:
+                if row+10 <= maxrow:
+                    row += 10
+            elif c == curses.KEY_PPAGE:
+                if row-10 >= 0:
+                    row -= 10
+            elif c in (curses.KEY_DOWN, ord("j")):
+                if row+1 < maxrow:
+                    row += 1
+            elif c in (curses.KEY_UP, ord("k")):
+                if row > 0:
+                    row -= 1
+
+    def search(self, word, div=0):
+        for x in self.packages[self.usel+div:]:
+            if re.search(word, "%s/%s" % x[1:3]):
+                self.change_usel(self.packages.index(x),False)
+                break
+        else:
+            self.screen.addstr(self.height-2,2,_("Not Found!"),
+                curses.color_pair(eerror))
+
+if __name__ == "__main__":
+    if "--help" in sys.argv:
+        print helptext
+        sys.exit()
+
+    # Get the path of the elogdir
+    if port_settings['PORT_LOGDIR']:
+        elogdir = os.path.join(port_settings['PORT_LOGDIR'],"elog")
+    else:
+        elogdir = os.path.join(os.sep,port_settings['EPREFIX'],"var","log","portage","elog")
+
+    # Launch curses interface
+    try:
+        curses.wrapper(ElogViewer)
+    except TermTooSmall:
+        print _("Your terminal window is too small, try to enlarge it")
+        sys.exit(1)
+    except NoLogFiles:
+        print _("There aren't any elog files on"),elogdir
+        sys.exit(1)
+    except CannotOpenElogdir:
+        print _("Cannot open"),elogdir
+        print _("Please check if the directory exists and if it's readable by your user.")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        pass
+# vim: set shiftwidth=4 tabstop=4 expandtab:

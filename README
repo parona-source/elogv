@@ -1,0 +1,41 @@
+Elogv is a simple tool written in python that allow you to easy read
+portage elog files. To launch it, type on a console:
+
+$ elogv
+
+Inside the program, you can use these keys:
+
+ - Down arrow -> Scroll the list of files down by 1 unit
+ - Up arrow -> opposite of Down arrow
+ - Pag Down -> Scroll the list down by 10 unit
+ - Pag Up -> opposite of Pag Down
+ - End -> Go to the last file of the list
+ - Home -> Go to the first file of the list
+ - t -> order the list of files by date, most recent on top
+ - a -> order the list of files alphabetically
+ - r -> reverse the list of files
+ - SpaceBar -> scroll the selected file
+ - h or F1 -> show the help screen, press Page Up/Down to scroll up and down,
+              h and F1 again to hide
+ - d -> removes log files, usage is similar to vim "d" command, here are
+        same examples:
+        	da -> removes all files
+        	de -> removes from selected item to the end of the list
+            ds -> remove from selected item to the start of the list
+            d1d or dd -> removes selected file only
+        	d4d -> removes 4 files starting from selected one
+ - q -> quit
+
+
+Note:
+
+To use this software you need the portage elog system configured on your
+/etc/make.conf, this is a simply configuration:
+
+---- /etc/make.conf
+# Logging
+PORTAGE_ELOG_CLASSES="warn error log"
+PORTAGE_ELOG_SYSTEM="save"
+----
+
+For other details see /etc/make.conf.example

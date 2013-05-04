@@ -1,0 +1,77 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2008-05-19 12:47+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: ../elogv:43
+msgid ""
+"\n"
+"Elogv is a portage elog viewer based on curses and python,\n"
+"you can use these keys to control the behavior of the program:\n"
+"\n"
+" - Down arrow or j -> scroll the list of files down by 1 unit\n"
+" - Up arrow or k -> opposite of Down arrow\n"
+" - PageDown -> scroll the list down by 10 unit\n"
+" - PageUp -> opposite of PageDown\n"
+" - End -> go to the last file of the list\n"
+" - Home -> go to the first file of the list\n"
+" - t -> order the list of files by date, most recent on top\n"
+" - a -> order the list of files alphabetically, the first time by category,\n"
+"        the second time (pressing the key again) by package name\n"
+" - c -> order the list of files by log class warning level\n"
+" - r -> reverse the list of files\n"
+" - SpaceBar -> scroll the selected file\n"
+" - h or F1 -> show the help screen, press Page Up/Down to scroll up and down,\n"
+"              h or F1 again to hide\n"
+" - d -> removes selected files, usage is similar to vim \"d\" command,\n"
+"        here are same examples:\n"
+"            da -> removes all files\n"
+"            de -> removes from selected item to the end of the list\n"
+"            ds -> remove from selected item to the start of the list\n"
+"            d1d or dd -> removes selected file only\n"
+"            d4d -> removes 4 files starting from selected one\n"
+" - / -> starts a search prompt, write a string and will be showed the next\n"
+"        package that contains your string, use ESC to exit\n"
+" - q -> quit\n"
+msgstr ""
+
+#: ../elogv:243
+msgid " Press F1 or h to show the help screen "
+msgstr ""
+
+#: ../elogv:426
+msgid "Continue..."
+msgstr ""
+
+#: ../elogv:503
+msgid "Not Found!"
+msgstr ""
+
+#: ../elogv:521
+msgid "Your terminal window is too small, try to enlarge it"
+msgstr ""
+
+#: ../elogv:524
+msgid "There aren't any elog files on"
+msgstr ""
+
+#: ../elogv:527
+msgid "Cannot open"
+msgstr ""
+
+#: ../elogv:528
+msgid "Please check if the directory exists and if it's readable by your user."
+msgstr ""
+

@@ -1,0 +1,3 @@
+To install elogv run in a root shell:
+
+	# python setup.py install

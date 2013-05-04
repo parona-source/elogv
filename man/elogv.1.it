@@ -1,0 +1,89 @@
+.TH ELOGV "1" "May 2008" "User Commands"
+.SH NAME
+elogv \- elog viewer
+.SH DESCRIPTION
+Elogv è un visualizzatore degli elog di portage basato su curses e python
+.SH USAGE
+All'interno del programma possono essere utilizzati le seguenti combinazioni di tasti:
+.TP
+.B "Freccia giù" o "j"
+Scorre la lista dei file di una unità verso il basso"Down arrow" or "j"
+.TP
+.B "Up arrow" o "k"
+L'opposto
+.TP
+.B "PagDown"
+Scorre la lista dei file di 10 unità verso il basso
+.TP
+.B "PagUp"
+L'opposto
+.TP
+.B End
+Sposta il cursore verso l'ultimo elemento della lista
+.TP
+.B Home
+Sposta il cursore verso il primo elemento della lista
+.TP
+.B t
+Ordina la lista dei file rispetto alla data, dal più recente al più vecchio
+.TP
+.B a
+Ordina la lista dei file alfabeticamente, premendo la prima volta rispetto
+alla categoria, la seconda rispetto al nome del pacchetto
+.TP
+.B c
+Ordina la lista dei file rispetto al livello di attenzione
+.TP
+.B r
+Inverte l'ordine della lista dei file
+.TP
+.B SpaceBar
+Scorre il testo all'interno del file selezionato
+.TP
+.B  h or F1
+Mostra la schermata di aiuto, premere Pag Su/Giù per scorrere, h o F1 di nuovo
+per chiudere
+.TP
+.B d
+Rimuove il file selezionati, l'utilizzo è simile al comando "d" di vim, ad
+esempio:
+.RS
+.TP
+.I da
+rimuove tutti i file
+.TP
+.I de
+rimuove tutti i file da quello selezionato alla fine della lista
+.TP
+.I ds
+rimuove tutti i file da quello selezionato al primo della lista
+.TP
+.I "d1d or dd"
+rimuove solo il file selezionato
+.TP
+.I d4d
+rimuove 4 file successivi partendo da quello selezionato
+.RE
+.TP
+.B /
+mostra il prompt di ricerca, scrivendo una stringa verrà spostato il cursore
+verso il file successivo che contiene la stringa, per uscire premere ESC
+.TP
+.B q
+Esce da elogv
+.SH NOTES
+Per usare questo software è necessario avere il sistema elog di portage
+configurato nel proprio /etc/make.conf, ecco un esempio:
+
+.nf
+# Logging
+PORTAGE_ELOG_CLASSES="warn error log"
+PORTAGE_ELOG_SYSTEM="save"
+.TP
+Per altre informazioni dare un'occhiata a /etc/make.conf.example
+.SH "REPORTING BUGS"
+Segnalare eventuali malfunzionamenti sul tracker di sourceforge:
+.P
+http://sourceforge.net/tracker/?group_id=176946
+.SH AUTHOR
+Luca Marturana (luca89) <lucamarturana@gmail.com>

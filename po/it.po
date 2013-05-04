@@ -1,0 +1,126 @@
+# Author: Luca Marturana (luca89) <lucamarturana@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# This file is distributed under the same license as the elogv package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: elogv\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-05-19 12:47+CEST\n"
+"PO-Revision-Date: 2008-05-11 20:19+0100\n"
+"Last-Translator: Luca Marturana <lucamarturana@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../elogv:43
+msgid ""
+"\n"
+"Elogv is a portage elog viewer based on curses and python,\n"
+"you can use these keys to control the behavior of the program:\n"
+"\n"
+" - Down arrow or j -> scroll the list of files down by 1 unit\n"
+" - Up arrow or k -> opposite of Down arrow\n"
+" - PageDown -> scroll the list down by 10 unit\n"
+" - PageUp -> opposite of PageDown\n"
+" - End -> go to the last file of the list\n"
+" - Home -> go to the first file of the list\n"
+" - t -> order the list of files by date, most recent on top\n"
+" - a -> order the list of files alphabetically, the first time by category,\n"
+"        the second time (pressing the key again) by package name\n"
+" - c -> order the list of files by log class warning level\n"
+" - r -> reverse the list of files\n"
+" - SpaceBar -> scroll the selected file\n"
+" - h or F1 -> show the help screen, press Page Up/Down to scroll up and "
+"down,\n"
+"              h or F1 again to hide\n"
+" - d -> removes selected files, usage is similar to vim \"d\" command,\n"
+"        here are same examples:\n"
+"            da -> removes all files\n"
+"            de -> removes from selected item to the end of the list\n"
+"            ds -> remove from selected item to the start of the list\n"
+"            d1d or dd -> removes selected file only\n"
+"            d4d -> removes 4 files starting from selected one\n"
+" - / -> starts a search prompt, write a string and will be showed the next\n"
+"        package that contains your string, use ESC to exit\n"
+" - q -> quit\n"
+msgstr ""
+"\n"
+"Elogv è un visualizzatore degli elog di portage basato su curses e python, \n"
+"per controllare si possono usare questi tasti:\n"
+"\n"
+"- Freccia giù o j -> Scorre la lista dei file di una unità verso il basso\n"
+"- Freccia su o k -> L'opposto\n"
+"- Pag giù -> Scorre la lista dei file di 10 unità verso il basso\n"
+"- Pag su -> L'opposto\n"
+"- Fine -> Sposta il cursore verso l'ultimo elemento della lista\n"
+"- Home -> Sposta il cursore verso il primo elemento della lista\n"
+"- t -> Ordina la lista dei file rispetto alla data, dal più recente al più\n"
+"       vecchio\n"
+"- a -> Ordina la lista dei file alfabeticamente, premendo la prima volta\n"
+"       rispetto alla categoria, la seconda rispetto al nome del pacchetto\n"
+"- c -> Ordina la lista dei file rispetto al livello di attenzione\n"
+"- r -> Inverte l'ordine della lista dei file\n"
+"- SpaceBar -> Scorre il testo all'interno del file selezionato\n"
+"- h o F1 -> Mostra la schermata di aiuto, premere Pag Su/Giù per scorrere,\n"
+"            h o F1 di nuovo per chiudere\n"
+"- d -> Rimuove il file selezionati, l'utilizzo è simile al comando \"d\" di\n"
+"       vim, ad esempio:\n"
+"             da -> rimuove tutti i file\n"
+"             de -> rimuove tutti i file da quello selezionato alla fine "
+"della\n"
+"                   lista\n"
+"             ds -> rimuove tutti i file da quello selezionato al primo "
+"della\n"
+"                   lista\n"
+"             d1d o dd -> rimuove solo il file selezionato\n"
+"             d4d -> rimuove 4 file successivi partendo da quello "
+"selezionato\n"
+"- / -> mostra il prompt di ricerca, scrivendo una stringa verrà spostato\n"
+"       il cursore verso il file successivo che contiene la stringa, per "
+"uscire\n"
+"       premere ESC\n"
+"- q -> Esce da elogv\n"
+
+#: ../elogv:243
+msgid " Press F1 or h to show the help screen "
+msgstr " Premi F1 o h per mostrare la schermata di aiuto "
+
+#: ../elogv:426
+msgid "Continue..."
+msgstr "Continua..."
+
+#: ../elogv:503
+msgid "Not Found!"
+msgstr "Non trovato!"
+
+#: ../elogv:521
+msgid "Your terminal window is too small, try to enlarge it"
+msgstr "La tua finestra del terminale è troppo piccola, prova ad allargarla"
+
+#: ../elogv:524
+msgid "There aren't any elog files on"
+msgstr "Non c'è alcun file di elog in"
+
+#: ../elogv:527
+msgid "Cannot open"
+msgstr "Impossibile aprire"
+
+#: ../elogv:528
+msgid "Please check if the directory exists and if it's readable by your user."
+msgstr "Controlla se la directory esiste e se è leggibile dal tuo utente"

@@ -1,0 +1,87 @@
+.TH ELOGV "1" "May 2008" "Benutzer-Kommandos"
+.SH NAME
+elogv \- elog-Betrachter
+.SH DESCRIPTION
+Elogv ist ein Betrachter für Portage elog-Dateien. Er basiert auf Python
+und der Curses-Bibliothek.
+.SH USAGE
+Die Bedienung erfolgt mit folgenden Tasten:
+.TP
+.B "Pfeil runter oder j"
+in der Liste einen Eintrag nach unten rücken
+.TP
+.B "Pfeil hoch oder k"
+Gegenteil von Pfeil runter
+.TP
+.B BildAb
+in der Liste zehn Einträge nach unten rücken
+.TP
+.B BildHoch
+Gegenteil von BildAb
+.TP
+.B Ende
+zum letzten Eintrag der Liste springen
+.TP
+.B Pos1
+zum erstem Eintrag der Liste springen
+.TP
+.B t
+Liste chronologisch sortieren, neustes oben
+.TP
+.B a
+Liste alphabetisch sortieren, nach dem ersten Betätigen nach
+Kategorie, nochmaliges Drücken nach Paketname
+.TP
+.B r
+Sortierreihenfolge umdrehen
+.TP
+.B Leertaste
+Eintrag der ausgewählten Datei scrollen
+.TP
+.B  h oder F1
+Hilfe anzeigen, BildHoch oder BildAb scrollen hoch und runter. Erneut h oder F1 schließen die Hilfe.
+.TP
+.B d
+ausgewählte Dateien entfernen, ähnlich dem d-Kommando von Vim. Beispiele:
+.RS
+.TP
+.I da
+alle Dateien entfernen
+.TP
+.I de
+vom ausgewählten Eintrag bis zum Ende der Liste
+.TP
+.I ds
+vom ausgewählten Eintrag bis zum Anfang der Liste
+.TP
+.I "d1d oder dd"
+nur die ausgewählten Dateien
+.TP
+.I d4d
+vier Einträge ausgehend vom ausgewählten Eintrag
+.RE
+.TP
+.B /
+eine Suchanfrage wird hiermit gestartet.  Die eingetippte Zeichenfolge wird gesucht und der nächste passende Eintrag angezeigt.
+.TP
+.B q
+Schließen
+.SH Hinweise
+Um diese Software nutzen zu können, müssen Sie das elog-System von
+Portage eingerichtet haben.  Die Minimalkonfiguration in
+/etc/make.conf ist:
+
+.nf
+# Logging
+PORTAGE_ELOG_CLASSES="warn error log"
+PORTAGE_ELOG_SYSTEM="save"
+.TP
+Details finden sich in /etc/make.conf.example
+.SH "REPORTING BUGS"
+Fehlerberichte (auf Englisch) bitte unter folgender URL melden:
+.P
+http://sourceforge.net/tracker/?group_id=176946
+.SH AUTHOR
+Luca Marturana (luca89) <lucamarturana@gmail.com>
+.SH ÜBERSETZUNG
+Christian Faulhammer <opfer@gentoo.org>
