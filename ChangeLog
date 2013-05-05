@@ -1,6 +1,9 @@
 # ChangeLog for elogv
 
-9.9.9
+0.7.6.1
+  * Fix crash for "TERM=vt100 elogv" invokation (Sebastian Pipping <sebastian@pipping.org>
+
+0.7.6
   * Add compression support, thanks to Julian Ospald <hasufell@gentoo.org>
 
 0.7.5 2010-04-26 Luca Marturana <lucamarturana@gmail.com>
