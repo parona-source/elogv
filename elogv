@@ -15,6 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+from __future__ import print_function
+
 import os
 import sys
 import re
@@ -307,8 +309,8 @@ class ElogViewer:
         try:
             self.openfile(pkg[PATH])
         except IOError:
-            # print ("Logfile not found at '%s'. Did it get deleted somehow?"
-            #     % os.path.join(elogdir,pkg[PATH]))
+            # print(("Logfile not found at '%s'. Did it get deleted somehow?"
+            #     % os.path.join(elogdir,pkg[PATH])))
             self.init_screen()
             self.change_usel(prev_usel, False)
         self.logf_wrap = self.wrap_logf_lines()
@@ -573,7 +575,7 @@ class ElogViewer:
 
 if __name__ == "__main__":
     if "--help" in sys.argv:
-        print helptext
+        print(helptext)
         sys.exit()
 
     # Get the path of the elogdir
@@ -586,14 +588,14 @@ if __name__ == "__main__":
     try:
         curses.wrapper(ElogViewer)
     except TermTooSmall:
-        print _("Your terminal window is too small, try to enlarge it")
+        print(_("Your terminal window is too small, try to enlarge it"))
         sys.exit(1)
     except NoLogFiles:
-        print _("There aren't any elog files on"),elogdir
+        print(_("There aren't any elog files on"), elogdir)
         sys.exit(1)
     except CannotOpenElogdir:
-        print _("Cannot open"),elogdir
-        print _("Please check if the directory exists and if it's readable by your user.")
+        print(_("Cannot open"), elogdir)
+        print(_("Please check if the directory exists and if it's readable by your user."))
         sys.exit(1)
     except KeyboardInterrupt:
         pass
