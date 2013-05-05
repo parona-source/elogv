@@ -77,9 +77,9 @@ PORTAGE_ELOG_SYSTEM="save"
 .TP
 Para otros detalles, vea el fichero /etc/make.conf.example
 .SH "INFORMANDO DE ERRORES"
-Informe de los errores en Sourceforge:
+Informe de los errores en GitHub:
 .P
-http://sourceforge.net/tracker/?group_id=176946
+https://github.com/luca89/elogv/issues
 .SH AUTOR
 Luca Marturana (luca89) <lucamarturana@gmail.com>
 .SH TRADUCCIÓN

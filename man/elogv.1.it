@@ -82,8 +82,8 @@ PORTAGE_ELOG_SYSTEM="save"
 .TP
 Per altre informazioni dare un'occhiata a /etc/make.conf.example
 .SH "REPORTING BUGS"
-Segnalare eventuali malfunzionamenti sul tracker di sourceforge:
+Segnalare eventuali malfunzionamenti sul tracker di GitHub:
 .P
-http://sourceforge.net/tracker/?group_id=176946
+https://github.com/luca89/elogv/issues
 .SH AUTHOR
 Luca Marturana (luca89) <lucamarturana@gmail.com>
