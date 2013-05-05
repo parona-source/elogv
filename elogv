@@ -26,6 +26,14 @@ from portage import settings as port_settings
 from glob import glob
 import gettext
 import locale
+import gzip
+import bz2
+
+no_liblzma = False
+try:
+    import liblzma
+except ImportError:
+    no_liblzma = True
 
 # Setup default locale
 locale.setlocale(locale.LC_ALL, '')
@@ -294,7 +302,7 @@ class ElogViewer:
         self.refresh_file_pad()
         self.logf.close()
         try:
-            self.logf = open(pkg[PATH])
+            self.openfile(pkg[PATH])
         except IOError:
             # print ("Logfile not found at '%s'. Did it get deleted somehow?"
             #     % os.path.join(elogdir,pkg[PATH]))
@@ -302,6 +310,19 @@ class ElogViewer:
             self.change_usel(prev_usel, False)
         self.logf_wrap = self.wrap_logf_lines()
         self.show_log()
+
+    def openfile(self, myfile):
+        if myfile.endswith('.xz'):
+            if not no_liblzma:
+                self.logf = liblzma.LZMAFile(myfile)
+            else:
+                sys.exit('You need pyliblzma library to be able to read xz compressed elog files.\nhttp://pypi.python.org/pypi/pyliblzma')
+        elif myfile.endswith('.gz'):
+            self.logf = gzip.open(myfile)
+        elif myfile.endswith('.bz2'):
+            self.logf = bz2.BZ2File(myfile)
+        else:
+            self.logf = open(myfile)
 
     def refresh_file_pad(self):
         """
@@ -320,7 +341,7 @@ class ElogViewer:
         """
         # Get the list of files
         try:
-            file_list = glob(os.path.join(elogdir,"*:*:*.log")) + glob(os.path.join(elogdir,"*","*:*.log"))
+            file_list = glob(os.path.join(elogdir,"*:*:*.log*")) + glob(os.path.join(elogdir,"*","*:*.log*"))
         except OSError:
             raise CannotOpenElogdir()
 
@@ -344,7 +365,9 @@ class ElogViewer:
             # then we split the string using as pattern / or : to obtain in any
             # case
             # ( "x11-themes", "haematite-xcursors", "1.0:20091018-195827.log")
-            (cat,pn,other) = re.split(":|" + os.path.sep, filepath.replace(elogdir + os.path.sep, "") )
+            if not filepath.endswith == ".log":
+                tmpfilepath = re.sub('\.log.*$', '.log', filepath)
+            (cat,pn,other) = re.split(":|" + os.path.sep, tmpfilepath.replace(elogdir + os.path.sep, "") )
             if sys.version_info[:2] >= (2, 5):
                 date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
             else:
@@ -382,7 +405,7 @@ class ElogViewer:
                     self.logf.close()
                 except AttributeError:
                     pass
-                self.logf = open(pkg[PATH])
+                self.openfile(pkg[PATH])
             else:
                 cp = normal
 
