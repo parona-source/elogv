@@ -59,7 +59,7 @@ class merge(Command):
             if os.path.exists(filename):
                 self.merge(filename)
             else:
-                print log.error('No catalog found for language %s' % self.lang)
+                log.error('No catalog found for language %s' % self.lang)
         else:
             files = glob('*.po')
             for f in files:
