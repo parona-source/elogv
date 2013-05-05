@@ -9,8 +9,6 @@ from distutils.command.clean import clean as _clean
 
 
 import os
-import sys
-import shutil
 from glob import glob
 
 ## Snippet of code found on 
