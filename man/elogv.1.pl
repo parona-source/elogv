@@ -80,7 +80,7 @@ Więcej informacji znajduje się w /etc/make.conf.example
 Błędy proszę zgłaszać w języku angielskim do naszego serwisu raportowania błędów:
 
 .P
-https://github.com/luca89/elogv/issues
+https://github.com/gentoo/elogv/issues
 .SH AUTOR
 Luca Marturana (luca89) <lucamarturana@gmail.com>
 .SH TŁUMACZENIE

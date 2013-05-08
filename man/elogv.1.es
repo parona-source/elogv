@@ -79,7 +79,7 @@ Para otros detalles, vea el fichero /etc/make.conf.example
 .SH "INFORMANDO DE ERRORES"
 Informe de los errores en GitHub:
 .P
-https://github.com/luca89/elogv/issues
+https://github.com/gentoo/elogv/issues
 .SH AUTOR
 Luca Marturana (luca89) <lucamarturana@gmail.com>
 .SH TRADUCCIÓN
