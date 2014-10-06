@@ -370,9 +370,11 @@ class ElogViewer:
             # then we split the string using as pattern / or : to obtain in any
             # case
             # ( "x11-themes", "haematite-xcursors", "1.0:20091018-195827.log")
-            if not filepath.endswith == ".log":
-                tmpfilepath = re.sub('\.log.*$', '.log', filepath)
-            (cat,pn,other) = re.split(":|" + os.path.sep, tmpfilepath.replace(elogdir + os.path.sep, "") )
+            tmpfilepath = re.sub('\.log.*$', '.log', filepath)
+            split_up = re.split(":|" + os.path.sep, tmpfilepath.replace(elogdir + os.path.sep, ""))
+            if len(split_up) < 3:
+                continue
+            (cat, pn, other) = split_up[-3:]
             if sys.version_info[:2] >= (2, 5):
                 date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
             else:
