@@ -1,0 +1,6 @@
+recursive-include man *.1*
+recursive-include po *.po *.pot
+include ChangeLog
+include ChangeLog.old
+include INSTALL
+include Makefile
