@@ -68,7 +68,7 @@ Iniciar una operación de búsqueda. Escriba una cadena de texto y se mostrará el 
 .B q
 Salir
 .SH NOTAS
-Para utilizar este software, usted necesita tener configurado el sistema de elog de Portage en su fichero /etc/make.conf. Esta es una configuración sencilla:
+Para utilizar este software, usted necesita tener configurado el sistema de elog de Portage en su fichero /etc/portage/make.conf. Esta es una configuración sencilla:
 
 .nf
 # Logging

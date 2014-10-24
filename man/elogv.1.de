@@ -69,7 +69,7 @@ Schließen
 .SH Hinweise
 Um diese Software nutzen zu können, müssen Sie das elog-System von
 Portage eingerichtet haben.  Die Minimalkonfiguration in
-/etc/make.conf ist:
+/etc/portage/make.conf ist:
 
 .nf
 # Logging

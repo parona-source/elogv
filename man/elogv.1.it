@@ -73,7 +73,7 @@ verso il file successivo che contiene la stringa, per uscire premere ESC
 Esce da elogv
 .SH NOTES
 Per usare questo software è necessario avere il sistema elog di portage
-configurato nel proprio /etc/make.conf, ecco un esempio:
+configurato nel proprio /etc/portage/make.conf, ecco un esempio:
 
 .nf
 # Logging

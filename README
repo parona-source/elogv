@@ -30,9 +30,9 @@ Inside the program, you can use these keys:
 Note:
 
 To use this software you need the portage elog system configured on your
-/etc/make.conf, this is a simply configuration:
+/etc/portage/make.conf, this is a simply configuration:
 
----- /etc/make.conf
+---- /etc/portage/make.conf
 # Logging
 PORTAGE_ELOG_CLASSES="warn error log"
 PORTAGE_ELOG_SYSTEM="save"

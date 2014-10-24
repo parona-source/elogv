@@ -68,7 +68,7 @@ włącza tryb wyszukiwania, wpisz ciąg znaków, a zostanie wybrany następny pa
 .B q
 wyjście
 .SH UWAGI
-Aby używać tego programu, musisz skonfigurować system elog w /etc/make.conf, oto przykładowa konfiguracja:
+Aby używać tego programu, musisz skonfigurować system elog w /etc/portage/make.conf, oto przykładowa konfiguracja:
 
 .nf
 # Logowanie
