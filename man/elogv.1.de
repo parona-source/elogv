@@ -76,7 +76,7 @@ Portage eingerichtet haben.  Die Minimalkonfiguration in
 PORTAGE_ELOG_CLASSES="warn error log"
 PORTAGE_ELOG_SYSTEM="save"
 .TP
-Details finden sich in /etc/make.conf.example
+Details finden sich in /usr/share/portage/config/make.conf.example
 .SH "REPORTING BUGS"
 Fehlerberichte (auf Englisch) bitte unter folgender URL melden:
 .P

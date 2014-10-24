@@ -80,7 +80,7 @@ configurato nel proprio /etc/make.conf, ecco un esempio:
 PORTAGE_ELOG_CLASSES="warn error log"
 PORTAGE_ELOG_SYSTEM="save"
 .TP
-Per altre informazioni dare un'occhiata a /etc/make.conf.example
+Per altre informazioni dare un'occhiata a /usr/share/portage/config/make.conf.example
 .SH "REPORTING BUGS"
 Segnalare eventuali malfunzionamenti sul tracker di GitHub:
 .P

@@ -75,7 +75,7 @@ Aby używać tego programu, musisz skonfigurować system elog w /etc/make.conf, 
 PORTAGE_ELOG_CLASSES="warn error log"
 PORTAGE_ELOG_SYSTEM="save"
 .TP
-Więcej informacji znajduje się w /etc/make.conf.example
+Więcej informacji znajduje się w /usr/share/portage/config/make.conf.example
 .SH "ZGŁASZANIE BŁĘDÓW"
 Błędy proszę zgłaszać w języku angielskim do naszego serwisu raportowania błędów:
 

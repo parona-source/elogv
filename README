@@ -38,4 +38,4 @@ PORTAGE_ELOG_CLASSES="warn error log"
 PORTAGE_ELOG_SYSTEM="save"
 ----
 
-For other details see /etc/make.conf.example
+For other details see /usr/share/portage/config/make.conf.example
