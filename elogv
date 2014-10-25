@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 # Author: Luca Marturana (luca89) <lucamarturana@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -98,6 +99,16 @@ class NoLogFiles(Exception):
 class CannotOpenElogdir(Exception):
     def __init__(self):
         pass
+
+def date2str(d):
+    u = d.strftime(date_format).decode(locale.getlocale()[1])
+    try:
+        u.encode('ascii')
+    except UnicodeEncodeError:
+        # Prevent crash locales like ja_JP.UTF-8, e.g. "2014年10月24日"
+        # https://bugs.gentoo.org/show_bug.cgi?id=464962
+        u = u.encode('ascii', errors='replace').decode('ascii')
+    return u
 
 # Main class (called with curses.wrapper later)
 class ElogViewer:
@@ -287,13 +298,13 @@ class ElogViewer:
                                  class_char,
                                  curses.A_BOLD + curses.color_pair(prev_pkg[CLASS]))
         self.file_pad.addstr(prev_usel,3,
-                                 list_format % (prev_pkg[CAT], prev_pkg[PN], prev_pkg[DATE].strftime(date_format) ),
+                                 list_format % (prev_pkg[CAT], prev_pkg[PN], date2str(prev_pkg[DATE]) ),
                                  curses.color_pair(normal))
         self.file_pad.addstr(self.usel,1,
                                  class_char,
                                  curses.A_BOLD + curses.color_pair(pkg[CLASS]))
         self.file_pad.addstr(self.usel,3,
-                                 list_format % (pkg[CAT], pkg[PN], pkg[DATE].strftime(date_format) ),
+                                 list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE]) ),
                                  curses.color_pair(selected))
 
         first = self.pposy
@@ -420,7 +431,7 @@ class ElogViewer:
                                  class_char,
                                  curses.A_BOLD + curses.color_pair(pkg[CLASS]))
             self.file_pad.addstr(i,3,
-                                 list_format % (pkg[CAT], pkg[PN], pkg[DATE].strftime(date_format) ),
+                                 list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE]) ),
                                  curses.color_pair(cp))
 
     def get_class(self,filepath):
