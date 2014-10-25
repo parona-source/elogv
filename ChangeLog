@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.6.3
+  * Prevent crash with LC_TIME=ja_JP.UTF-8 (Gentoo bug #464962)
+
 0.7.6.2
   * Make log filename parsing more robust (Gentoo bug #503904)
   * Fix locations of make.conf(.example)
