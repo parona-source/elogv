@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.6.5
+  * Prevent crash with LC_TIME=en_DK (issue #3)
+
 0.7.6.4
   * Fix crash when log files with bad names are found, only
   * Fix crash for PORT_LOGDIR containing ".log" (issue #4)
