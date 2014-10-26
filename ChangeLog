@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.6.7
+  * Fix resuming from Ctrl-Z/SIGTSTP (Gentoo bug #348110)
+
 0.7.6.5
   * Prevent crash with LC_TIME=en_DK (issue #3)
 
