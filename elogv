@@ -32,14 +32,64 @@ import locale
 import gzip
 import bz2
 
+_LOCALE_CATEGORY_PAIRS = (
+		(locale.LC_COLLATE, 'LC_COLLATE'),
+		(locale.LC_CTYPE, 'LC_CTYPE'),
+		(locale.LC_MESSAGES, 'LC_MESSAGES'),
+		(locale.LC_MONETARY, 'LC_MONETARY'),
+		(locale.LC_NUMERIC, 'LC_NUMERIC'),
+		(locale.LC_TIME, 'LC_TIME'),
+)
+
 no_liblzma = False
 try:
     import liblzma
 except ImportError:
     no_liblzma = True
 
-# Setup default locale
-locale.setlocale(locale.LC_ALL, '')
+
+def report_bad_locale(variable, value):
+    py_version = '%s.%s.%s' % sys.version_info[:3]
+    print('ERROR: Locale "%s" does not seem to be supported.' % value, file=sys.stderr)
+    if value not in locale.locale_alias:
+        print('  Note: Locale "%s" is not a known alias to Python %s (check locale.locale_alias).' % (value, py_version), file=sys.stderr)
+    if not ('.' in value or '@' in value):
+        print('  Hint: Try specifying the encoding (e.g. %s=%s.UTF-8).' % (variable, value), file=sys.stderr)
+
+reported_bad_locales = set()
+
+
+# Enable support for user locale
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except locale.Error:
+    # Find guilty value and variable
+    for category, variable in _LOCALE_CATEGORY_PAIRS:
+        if variable not in os.environ:
+            continue
+        value = os.environ[variable]
+        if value in reported_bad_locales:
+            continue
+        try:
+            locale.setlocale(category, value)
+        except locale.Error:
+            report_bad_locale(variable, value)
+            reported_bad_locales.add(value)
+
+# Test locale in depth (issue #3), try to be helpful
+for category, variable in _LOCALE_CATEGORY_PAIRS:
+    try:
+        locale.getlocale(category)
+    except ValueError as e:
+        value = os.environ[variable]
+        if value in reported_bad_locales:
+            continue
+        report_bad_locale(variable, value)
+        reported_bad_locales.add(value)
+
+if reported_bad_locales:
+    sys.exit(1)
+
 
 # Setup gettext. Note that lgettext() is used instead of gettext()
 # because it always returns strings encoded with the preferred system
