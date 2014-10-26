@@ -361,9 +361,6 @@ class ElogViewer:
         except OSError:
             raise CannotOpenElogdir()
 
-        if not file_list:
-            raise NoLogFiles()
-
         # self.packages contains all info extracted from each file, this is the
         # structure:
         # [ ("filename", "category", "package name", date:datetime_obj, class:int), ... ]
@@ -394,6 +391,9 @@ class ElogViewer:
                 date_str = other[:8]
                 date = datetime(int(date_str[:4]),int(date_str[4:6]),int(date_str[6:]))
             self.packages.append( (filepath, cat, pn, date, self.get_class(filepath)) )
+
+        if not self.packages:
+            raise NoLogFiles()
 
         # Maybe that after removing files self.usel points to a wrong index,
         # so this will prevent a crash

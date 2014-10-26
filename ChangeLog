@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.6.4
+  * Fix crash when log files with bad names are found, only
+
 0.7.6.3
   * Prevent crash with LC_TIME=ja_JP.UTF-8 (Gentoo bug #464962)
 
