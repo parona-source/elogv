@@ -1,6 +1,9 @@
 # ChangeLog for elogv
 
-0.7.6.7
+0.7.6.6
+  * Fix crash for locale without explicit encoding,
+      e.g. when running LC_ALL=C elogv (Gentoo bug #527240)
+  * Check locale variable LC_ALL during startup, too.
   * Fix resuming from Ctrl-Z/SIGTSTP (Gentoo bug #348110)
 
 0.7.6.5

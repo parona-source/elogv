@@ -40,6 +40,8 @@ _LOCALE_CATEGORY_PAIRS = (
 		(locale.LC_MONETARY, 'LC_MONETARY'),
 		(locale.LC_NUMERIC, 'LC_NUMERIC'),
 		(locale.LC_TIME, 'LC_TIME'),
+
+		(locale.LC_ALL, 'LC_ALL'),
 )
 
 no_liblzma = False
@@ -79,6 +81,9 @@ except locale.Error:
 
 # Test locale in depth (issue #3), try to be helpful
 for category, variable in _LOCALE_CATEGORY_PAIRS:
+    if category == locale.LC_ALL:
+        continue
+
     try:
         locale.getlocale(category)
     except ValueError as e:
@@ -164,7 +169,25 @@ def handle_sig_cont(signum, frame):
 
 
 def date2str(d):
-    u = d.strftime(date_format).decode(locale.getlocale()[1])
+    b = d.strftime(date_format)
+
+    for encoding in (
+            locale.getlocale(locale.LC_TIME)[1],
+            locale.getlocale()[1],
+            sys.getdefaultencoding(),
+            'utf-8',
+            ):
+        if encoding is None:
+            continue
+
+        try:
+            u = b.decode(encoding)
+            break
+        except UnicodeDecodeError:
+            pass
+    else:
+        raise ValueError('Cannot decode byte stream')
+
     try:
         u.encode('ascii')
     except UnicodeEncodeError:
