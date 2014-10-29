@@ -189,12 +189,13 @@ def date2str(d):
         raise ValueError('Cannot decode byte stream')
 
     try:
-        u.encode('ascii')
+        b = u.encode('ascii')
     except UnicodeEncodeError:
         # Prevent crash locales like ja_JP.UTF-8, e.g. "2014年10月24日"
         # https://bugs.gentoo.org/show_bug.cgi?id=464962
-        u = u.encode('ascii', errors='replace').decode('ascii')
-    return u
+        b = u.encode('ascii', errors='replace')
+
+    return b
 
 # Main class (called with curses.wrapper later)
 class ElogViewer:
