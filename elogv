@@ -504,8 +504,7 @@ class ElogViewer:
         self.file_pad = curses.newpad(len(self.packages),self.width)
         self.file_pad.erase()
 
-        for i in range(len(self.packages)):
-            pkg = self.packages[i]
+        for i, pkg in enumerate(self.packages):
             if i == self.usel:
                 cp = selected
                 # Maybe that the logf pointed by self.usel changed, (example
