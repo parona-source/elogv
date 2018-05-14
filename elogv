@@ -550,15 +550,12 @@ class ElogViewer:
         for line in self.logf.readlines():
             if not line.strip():
                 # textwrap eats newlines
-                result.append("\n")
+                yield "\n"
             else:
                 # Returns a list of new lines minus the line ending \n
                 wrapped_line = textwrap.wrap(line, width=self.width-2)
                 for l in wrapped_line:
-                    l += "\n" 
-                    result.append(l)
-
-        return iter(result)
+                    yield l + "\n"
 
     def show_log(self):
         """
