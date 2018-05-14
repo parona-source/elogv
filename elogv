@@ -547,8 +547,7 @@ class ElogViewer:
         """
         result = []
         self.logf.seek(0)
-        logf = self.logf.readlines()
-        for line in logf:
+        for line in self.logf.readlines():
             if not line.strip():
                 # textwrap eats newlines
                 result.append("\n")
