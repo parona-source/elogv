@@ -181,7 +181,10 @@ def date2str(d):
             continue
 
         try:
-            u = b.decode(encoding)
+            if isinstance(b, bytes):
+                u = b.decode(encoding)
+            else:
+                u = b
             break
         except UnicodeDecodeError:
             pass
@@ -189,7 +192,10 @@ def date2str(d):
         raise ValueError('Cannot decode byte stream')
 
     try:
-        b = u.encode('ascii')
+        if not isinstance(b, str):
+            b = u.encode('ascii')
+        else:
+            b = u
     except UnicodeEncodeError:
         # Prevent crash locales like ja_JP.UTF-8, e.g. "2014年10月24日"
         # https://bugs.gentoo.org/show_bug.cgi?id=464962
@@ -395,7 +401,7 @@ class ElogViewer:
                                  curses.color_pair(selected))
 
         first = self.pposy
-        last = (self.height / 2 - 2) + first
+        last = (self.height // 2 - 2) + first
 
         if self.usel < first:
             self.pposy -= first - self.usel
@@ -525,10 +531,8 @@ class ElogViewer:
         """
         Get the highest elog class in a file
         """
-        f = file(filepath)
-
-        classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
-        f.close()
+        with open(filepath) as f:
+            classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
 
         if "ERROR:" in classes:
             return eerror
@@ -570,7 +574,7 @@ class ElogViewer:
 
         for i in range(0,self.height//2-4):
             try:
-                x = self.logf_wrap.next()
+                x = next(self.logf_wrap)
             except StopIteration:
                 shown_all = True
                 # Restart the iterator
