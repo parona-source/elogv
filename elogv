@@ -145,16 +145,15 @@ date_format = "%x"
 
 # Exceptions classes
 class TermTooSmall(Exception):
-    def __init__(self):
-        pass
+    """Terminal too small."""
+
 
 class NoLogFiles(Exception):
-    def __init__(self):
-        pass
+    """No log files."""
+
 
 class CannotOpenElogdir(Exception):
-    def __init__(self):
-        pass
+    """Directory could not be opened."""
 
 
 def handle_sig_tstp(signum, frame):
