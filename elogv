@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
-# Author: Luca Marturana (luca89) <lucamarturana@gmail.com>
-
+# Authors (in chronological order):
+#  - Luca Marturana (luca89) <lucamarturana@gmail.com>
+#  - Julian Ospald (hasufell) <julian.ospald@googlemail.com>
+#  - Sebastian Pipping (sping) <sebastian@pipping.org>
+#  - Gilles Dartiguelongue (EvaSDK) <eva@gentoo.org>
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
