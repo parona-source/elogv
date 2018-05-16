@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 # Author: Luca Marturana (luca89) <lucamarturana@gmail.com>
 
@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-from __future__ import print_function
 
 import os
 import sys
@@ -145,16 +143,15 @@ date_format = "%x"
 
 # Exceptions classes
 class TermTooSmall(Exception):
-    def __init__(self):
-        pass
+    """Terminal too small."""
+
 
 class NoLogFiles(Exception):
-    def __init__(self):
-        pass
+    """No log files."""
+
 
 class CannotOpenElogdir(Exception):
-    def __init__(self):
-        pass
+    """Directory could not be opened."""
 
 
 def handle_sig_tstp(signum, frame):
@@ -181,7 +178,10 @@ def date2str(d):
             continue
 
         try:
-            u = b.decode(encoding)
+            if isinstance(b, bytes):
+                u = b.decode(encoding)
+            else:
+                u = b
             break
         except UnicodeDecodeError:
             pass
@@ -189,7 +189,10 @@ def date2str(d):
         raise ValueError('Cannot decode byte stream')
 
     try:
-        b = u.encode('ascii')
+        if not isinstance(b, str):
+            b = u.encode('ascii')
+        else:
+            b = u
     except UnicodeEncodeError:
         # Prevent crash locales like ja_JP.UTF-8, e.g. "2014年10月24日"
         # https://bugs.gentoo.org/show_bug.cgi?id=464962
@@ -395,7 +398,7 @@ class ElogViewer:
                                  curses.color_pair(selected))
 
         first = self.pposy
-        last = (self.height / 2 - 2) + first
+        last = (self.height // 2 - 2) + first
 
         if self.usel < first:
             self.pposy -= first - self.usel
@@ -470,13 +473,7 @@ class ElogViewer:
             if len(split_up) < 3:
                 continue
             (cat, pn, other) = split_up[-3:]
-            if sys.version_info[:2] >= (2, 5):
-                date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
-            else:
-                # This is for backward compatibility with older version of python
-                # it will be removed in the future
-                date_str = other[:8]
-                date = datetime(int(date_str[:4]),int(date_str[4:6]),int(date_str[6:]))
+            date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
             self.packages.append( (filepath, cat, pn, date, self.get_class(filepath)) )
 
         if not self.packages:
@@ -499,8 +496,7 @@ class ElogViewer:
         self.file_pad = curses.newpad(len(self.packages),self.width)
         self.file_pad.erase()
 
-        for i in range(len(self.packages)):
-            pkg = self.packages[i]
+        for i, pkg in enumerate(self.packages):
             if i == self.usel:
                 cp = selected
                 # Maybe that the logf pointed by self.usel changed, (example
@@ -525,10 +521,8 @@ class ElogViewer:
         """
         Get the highest elog class in a file
         """
-        f = file(filepath)
-
-        classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
-        f.close()
+        with open(filepath) as f:
+            classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
 
         if "ERROR:" in classes:
             return eerror
@@ -545,19 +539,15 @@ class ElogViewer:
         """
         result = []
         self.logf.seek(0)
-        logf = self.logf.readlines()
-        for line in logf:
+        for line in self.logf.readlines():
             if not line.strip():
                 # textwrap eats newlines
-                result.append("\n")
+                yield "\n"
             else:
                 # Returns a list of new lines minus the line ending \n
                 wrapped_line = textwrap.wrap(line, width=self.width-2)
                 for l in wrapped_line:
-                    l += "\n" 
-                    result.append(l)
-
-        return iter(result)
+                    yield l + "\n"
 
     def show_log(self):
         """
@@ -570,7 +560,7 @@ class ElogViewer:
 
         for i in range(0,self.height//2-4):
             try:
-                x = self.logf_wrap.next()
+                x = next(self.logf_wrap)
             except StopIteration:
                 shown_all = True
                 # Restart the iterator
