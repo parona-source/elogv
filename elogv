@@ -619,8 +619,8 @@ class ElogViewer:
 
     def show_help(self):
         # Setup help window
-        helpwin_height = self.height / 3 * 2
-        helpwin_corner = (self.height / 6, self.width// 2 - 40)
+        helpwin_height = self.height // 3 * 2
+        helpwin_corner = (self.height // 6, self.width // 2 - 40)
         helpwin = curses.newwin(helpwin_height, 80,
                                      helpwin_corner[0], helpwin_corner[1])
         helplines = helptext.splitlines()
