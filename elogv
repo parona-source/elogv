@@ -104,7 +104,8 @@ if reported_bad_locales:
 # encoding, not encoded with the same codeset used in the translation
 # file
 gettext.textdomain('elogv')
-_ = gettext.lgettext
+gettext.bind_textdomain_codeset('elogv', locale.getpreferredencoding())
+_ = gettext.gettext
 
 # This text is used on the in-line help
 helptext = _("""
@@ -619,8 +620,8 @@ class ElogViewer:
 
     def show_help(self):
         # Setup help window
-        helpwin_height = self.height / 3 * 2
-        helpwin_corner = (self.height / 6, self.width// 2 - 40)
+        helpwin_height = self.height // 3 * 2
+        helpwin_corner = (self.height // 6, self.width // 2 - 40)
         helpwin = curses.newwin(helpwin_height, 80,
                                      helpwin_corner[0], helpwin_corner[1])
         helplines = helptext.splitlines()
