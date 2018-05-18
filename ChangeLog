@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.7.1
+  * Fix some Python 3 issues (issue #8, pull request #9)
+
 0.7.7
   * Move towards Python 3 (issue #5, pull request #7)
 
