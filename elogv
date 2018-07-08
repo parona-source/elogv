@@ -498,6 +498,12 @@ class ElogViewer:
         else:
             self.packages.sort(key=self.get_packages_key, reverse=self.sort_method[1])
 
+        # Curses' newpad fails for nlines >32767 so we truncate the list
+        # of log files to not exceed that limit (issue #10)
+        MAX_ENTRIES = 2 ** 15 - 1
+        if len(self.packages) > MAX_ENTRIES:
+            self.packages = self.packages[:MAX_ENTRIES]
+
         self.file_pad = curses.newpad(len(self.packages),self.width)
         self.file_pad.erase()
 
