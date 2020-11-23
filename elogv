@@ -99,12 +99,8 @@ if reported_bad_locales:
     sys.exit(1)
 
 
-# Setup gettext. Note that lgettext() is used instead of gettext()
-# because it always returns strings encoded with the preferred system
-# encoding, not encoded with the same codeset used in the translation
-# file
+# Setup gettext.
 gettext.textdomain('elogv')
-gettext.bind_textdomain_codeset('elogv', locale.getpreferredencoding())
 _ = gettext.gettext
 
 # This text is used on the in-line help

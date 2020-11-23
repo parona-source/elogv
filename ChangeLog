@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.7.9
+  * Address deprecation warnings for Python >=3.8 (Gentoo bug #756019)
+
 0.7.8
   * Fix start-up for >32767 log files (issue #10)
 
