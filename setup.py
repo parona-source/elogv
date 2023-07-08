@@ -258,6 +258,7 @@ setup(name="elogv",
       license="GPL-2",
       description="Curses based utility to view elogs created by Portage",
       url="https://gitweb.gentoo.org/proj/elogv.git/",
+      packages=[],
       scripts=['elogv'],
       cmdclass={
           'extract_messages': messages,
