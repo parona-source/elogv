@@ -252,7 +252,7 @@ class install_manpages(Command):
 man_pages = glob("man/*")
 
 setup(name="elogv",
-      version="0.7.9",
+      version="0.8.0",
       author="Luca Marturana",
       author_email="lucamarturana@gmail.com",
       license="GPL-2",
