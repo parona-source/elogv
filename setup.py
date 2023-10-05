@@ -1,11 +1,12 @@
 from distutils.core import setup
-from distutils import log
 from distutils.cmd import Command
 from distutils.file_util import copy_file
 from distutils.dir_util import remove_tree
 from distutils.command.build import build as _build
 from distutils.command.install import install as _install
 from distutils.command.clean import clean as _clean
+
+import logging
 
 import os
 from glob import glob
@@ -33,7 +34,7 @@ class messages(Command):
     def run(self):
         wd = os.getcwd()
         name = self.distribution.get_name()
-        log.info('Extracting messages from %s' % name)
+        logging.info('Extracting messages from %s' % name)
         os.chdir('po')
         os.system('pygettext -k i18n -o %s.pot ../%s' % (name, name))
         os.chdir(wd)
@@ -60,7 +61,7 @@ class merge(Command):
             if os.path.exists(filename):
                 self.merge(filename)
             else:
-                log.error('No catalog found for language %s' % self.lang)
+                logging.error('No catalog found for language %s' % self.lang)
         else:
             files = glob('*.po')
             for f in files:
@@ -69,7 +70,7 @@ class merge(Command):
 
     def merge(self, f):
         name = self.distribution.get_name()
-        log.info('Merging catalog %s' % f)
+        logging.info('Merging catalog %s' % f)
         os.system('msgmerge %s %s.pot -o %s' % (f, name, f))
 
 
@@ -93,7 +94,7 @@ class build_messages(Command):
             base = os.path.basename(f)
             base = os.path.splitext(base)[0]
             out_file = os.path.join(self.build_dir, '%s.gmo' % base)
-            log.info('Building catalog %s > %s' % (f, out_file))
+            logging.info('Building catalog %s > %s' % (f, out_file))
             cmd = 'msgfmt -o "%s" %s' % (out_file, f)
             os.system(cmd)
 
@@ -181,7 +182,7 @@ class clean(_clean):
         if os.path.exists(self.build_temp):
             remove_tree(self.build_temp, dry_run=self.dry_run)
         else:
-            log.debug("'%s' does not exist -- can't clean it", self.build_temp)
+            logging.debug("'%s' does not exist -- can't clean it", self.build_temp)
 
         if self.all:
             # remove build directories
@@ -190,7 +191,7 @@ class clean(_clean):
                 if os.path.exists(directory):
                     remove_tree(directory, dry_run=self.dry_run)
                 else:
-                    log.warn("'%s' does not exist -- can't clean it",
+                    logging.warn("'%s' does not exist -- can't clean it",
                              directory)
 
         # just for the heck of it, try to remove the base build directory:
@@ -198,7 +199,7 @@ class clean(_clean):
         if not self.dry_run:
             try:
                 os.rmdir(self.build_base)
-                log.info("removing '%s'", self.build_base)
+                logging.info("removing '%s'", self.build_base)
             except OSError:
                 pass
 
