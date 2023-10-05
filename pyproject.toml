@@ -1,3 +1,15 @@
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "elogv"
+version = "0.8.0"
+authors = [
+    {name = "Luca Marturana", email = "lucamarturana@gmail.com"},
+]
+license = {text = "GPL-2"}
+description = "Curses based utility to view elogs created by Portage"
+
+[project.urls]
+homepage = "https://gitweb.gentoo.org/proj/elogv.git/"

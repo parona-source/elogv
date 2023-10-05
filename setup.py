@@ -204,14 +204,7 @@ class install_manpages(Command):
 
 man_pages = glob("man/*")
 
-setup(name="elogv",
-      version="0.8.0",
-      author="Luca Marturana",
-      author_email="lucamarturana@gmail.com",
-      license="GPL-2",
-      description="Curses based utility to view elogs created by Portage",
-      url="https://gitweb.gentoo.org/proj/elogv.git/",
-      packages=[],
+setup(packages=[],
       scripts=['elogv'],
       cmdclass={
           'extract_messages': messages,
