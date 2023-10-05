@@ -1,12 +1,10 @@
-from setuptools import setup
-from setuptools import Command
-from setuptools.command.build import build as _build
-from setuptools.command.install import install as _install
-
 import logging
-
 import os
 from glob import glob
+
+from setuptools import Command, setup
+from setuptools.command.build import build as _build
+from setuptools.command.install import install as _install
 
 ## Snippet of code found on
 ## http://developer.berlios.de/snippet/detail.php?type=snippet&id=100019
