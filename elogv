@@ -418,18 +418,22 @@ class ElogViewer:
         self.logf_wrap = self.wrap_logf_lines()
         self.show_log()
 
-    def openfile(self, myfile):
-        if myfile.endswith('.xz'):
+    @staticmethod
+    def open(file, mode='rt'):
+        if file.endswith('.xz'):
             if not no_liblzma:
-                self.logf = liblzma.LZMAFile(myfile)
+                return liblzma.LZMAFile(file)
             else:
                 sys.exit('You need pyliblzma library to be able to read xz compressed elog files.\nhttp://pypi.python.org/pypi/pyliblzma')
-        elif myfile.endswith('.gz'):
-            self.logf = gzip.open(myfile)
-        elif myfile.endswith('.bz2'):
-            self.logf = bz2.BZ2File(myfile)
+        elif file.endswith('.gz'):
+            return gzip.open(file, mode=mode)
+        elif file.endswith('.bz2'):
+            return bz2.open(file, mode=mode)
         else:
-            self.logf = open(myfile)
+            return open(file, mode=mode)
+
+    def openfile(self, file):
+        self.logf = self.open(file)
 
     def refresh_file_pad(self):
         """
@@ -528,7 +532,7 @@ class ElogViewer:
         """
         Get the highest elog class in a file
         """
-        with open(filepath) as f:
+        with self.open(filepath) as f:
             classes = re.findall("LOG:|INFO:|WARN:|ERROR:", f.read())
 
         if "ERROR:" in classes:
