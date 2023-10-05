@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.8.2
+  * Fix decompression and port to standard library lzma
+
 0.8.1
   * Port to setuptools and PEP517 (Gentoo bug #841134)
 
