@@ -1,11 +1,9 @@
-from distutils.core import setup
-from distutils import log
-from distutils.cmd import Command
-from distutils.file_util import copy_file
-from distutils.dir_util import remove_tree
-from distutils.command.build import build as _build
-from distutils.command.install import install as _install
-from distutils.command.clean import clean as _clean
+from setuptools import setup
+from setuptools import Command
+from setuptools.command.build import build as _build
+from setuptools.command.install import install as _install
+
+import logging
 
 import os
 from glob import glob
@@ -33,7 +31,7 @@ class messages(Command):
     def run(self):
         wd = os.getcwd()
         name = self.distribution.get_name()
-        log.info('Extracting messages from %s' % name)
+        logging.info('Extracting messages from %s' % name)
         os.chdir('po')
         os.system('pygettext -k i18n -o %s.pot ../%s' % (name, name))
         os.chdir(wd)
@@ -60,7 +58,7 @@ class merge(Command):
             if os.path.exists(filename):
                 self.merge(filename)
             else:
-                log.error('No catalog found for language %s' % self.lang)
+                logging.error('No catalog found for language %s' % self.lang)
         else:
             files = glob('*.po')
             for f in files:
@@ -69,7 +67,7 @@ class merge(Command):
 
     def merge(self, f):
         name = self.distribution.get_name()
-        log.info('Merging catalog %s' % f)
+        logging.info('Merging catalog %s' % f)
         os.system('msgmerge %s %s.pot -o %s' % (f, name, f))
 
 
@@ -93,7 +91,7 @@ class build_messages(Command):
             base = os.path.basename(f)
             base = os.path.splitext(base)[0]
             out_file = os.path.join(self.build_dir, '%s.gmo' % base)
-            log.info('Building catalog %s > %s' % (f, out_file))
+            logging.info('Building catalog %s > %s' % (f, out_file))
             cmd = 'msgfmt -o "%s" %s' % (out_file, f)
             os.system(cmd)
 
@@ -155,52 +153,7 @@ class install_messages(Command):
             self.mkpath(out_dir)
             out_file = os.path.join(out_dir,
                                     '%s.mo' % self.distribution.get_name())
-            copy_file(c, out_file)
-
-
-class clean(_clean):
-    _clean.user_options.append(
-        ('build-messages=', None,
-         "build directory for messages (default: 'build.build-messages')"))
-
-    def initialize_options(self):
-        _clean.initialize_options(self)
-        self.build_messages = None
-
-    def finalize_options(self):
-        self.set_undefined_options('build', ('build_base', 'build_base'),
-                                   ('build_lib', 'build_lib'),
-                                   ('build_scripts', 'build_scripts'),
-                                   ('build_temp', 'build_temp'),
-                                   ('build_messages', 'build_messages'))
-        self.set_undefined_options('bdist', ('bdist_base', 'bdist_base'))
-
-    def run(self):
-        # remove the build/temp.<plat> directory (unless it's already
-        # gone)
-        if os.path.exists(self.build_temp):
-            remove_tree(self.build_temp, dry_run=self.dry_run)
-        else:
-            log.debug("'%s' does not exist -- can't clean it", self.build_temp)
-
-        if self.all:
-            # remove build directories
-            for directory in (self.build_lib, self.bdist_base,
-                              self.build_scripts, self.build_messages):
-                if os.path.exists(directory):
-                    remove_tree(directory, dry_run=self.dry_run)
-                else:
-                    log.warn("'%s' does not exist -- can't clean it",
-                             directory)
-
-        # just for the heck of it, try to remove the base build directory:
-        # we might have emptied it right now, but if not we don't care
-        if not self.dry_run:
-            try:
-                os.rmdir(self.build_base)
-                log.info("removing '%s'", self.build_base)
-            except OSError:
-                pass
+            self.copy_file(c, out_file)
 
 
 ## Class modified to add manpages command
@@ -251,14 +204,7 @@ class install_manpages(Command):
 
 man_pages = glob("man/*")
 
-setup(name="elogv",
-      version="0.8.0",
-      author="Luca Marturana",
-      author_email="lucamarturana@gmail.com",
-      license="GPL-2",
-      description="Curses based utility to view elogs created by Portage",
-      url="https://gitweb.gentoo.org/proj/elogv.git/",
-      packages=[],
+setup(packages=[],
       scripts=['elogv'],
       cmdclass={
           'extract_messages': messages,
@@ -268,5 +214,4 @@ setup(name="elogv",
           'install_messages': install_messages,
           'install_manpages': install_manpages,
           'install': install,
-          'clean': clean
       })
