@@ -1,5 +1,8 @@
 # ChangeLog for elogv
 
+0.8.1
+  * Port to setuptools and PEP517 (Gentoo bug #841134)
+
 0.8.0
   * Set "packages=[]" in setup.py to fix the build
 
