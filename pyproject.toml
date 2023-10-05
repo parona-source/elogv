@@ -10,6 +10,10 @@ authors = [
 ]
 license = {text = "GPL-2"}
 description = "Curses based utility to view elogs created by Portage"
+dependencies = ["portage"]
 
 [project.urls]
 homepage = "https://gitweb.gentoo.org/proj/elogv.git/"
+
+[project.optional-dependencies]
+lzma = [ "pyliblzma" ]
