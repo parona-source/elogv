@@ -1,5 +1,3 @@
-from distutils.file_util import copy_file
-
 from setuptools import setup
 from setuptools import Command
 from setuptools.command.build import build as _build
@@ -155,7 +153,7 @@ class install_messages(Command):
             self.mkpath(out_dir)
             out_file = os.path.join(out_dir,
                                     '%s.mo' % self.distribution.get_name())
-            copy_file(c, out_file)
+            self.copy_file(c, out_file)
 
 
 ## Class modified to add manpages command
