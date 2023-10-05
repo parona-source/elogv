@@ -33,6 +33,7 @@ import gettext
 import locale
 import gzip
 import bz2
+import lzma
 import signal
 
 _LOCALE_CATEGORY_PAIRS = (
@@ -45,12 +46,6 @@ _LOCALE_CATEGORY_PAIRS = (
 
 		(locale.LC_ALL, 'LC_ALL'),
 )
-
-no_liblzma = False
-try:
-    import liblzma
-except ImportError:
-    no_liblzma = True
 
 
 def report_bad_locale(variable, value):
@@ -421,10 +416,7 @@ class ElogViewer:
     @staticmethod
     def open(file, mode='rt'):
         if file.endswith('.xz'):
-            if not no_liblzma:
-                return liblzma.LZMAFile(file)
-            else:
-                sys.exit('You need pyliblzma library to be able to read xz compressed elog files.\nhttp://pypi.python.org/pypi/pyliblzma')
+            return lzma.open(file, mode=mode)
         elif file.endswith('.gz'):
             return gzip.open(file, mode=mode)
         elif file.endswith('.bz2'):
