@@ -92,7 +92,7 @@ for category, variable in _LOCALE_CATEGORY_PAIRS:
 
     try:
         locale.getlocale(category)
-    except ValueError as e:
+    except ValueError:
         value = os.environ[variable]
         if value in reported_bad_locales:
             continue
@@ -569,7 +569,6 @@ class ElogViewer:
         """
         Takes a file-like object and wraps long lines. Returns a list iterator.
         """
-        result = []
         self.logf.seek(0)
         for line in self.logf.readlines():
             if not line.strip():
@@ -577,9 +576,9 @@ class ElogViewer:
                 yield "\n"
             else:
                 # Returns a list of new lines minus the line ending \n
-                wrapped_line = textwrap.wrap(line, width=self.width - 2)
-                for l in wrapped_line:
-                    yield l + "\n"
+                wrapped_lines = textwrap.wrap(line, width=self.width - 2)
+                for output_line in wrapped_lines:
+                    yield output_line + "\n"
 
     def show_log(self):
         """
