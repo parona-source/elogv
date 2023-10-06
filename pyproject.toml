@@ -22,3 +22,8 @@ extend_exclude = "(man|po|.*.egg-info)"
 [tool.isort]
 profile = "black"
 src_paths = ["elogv"]
+
+[tool.ruff]
+include = ["elogv", "setup.py"]
+# Ignore long line violations
+ignore = ["E501"]
