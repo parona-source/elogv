@@ -8,7 +8,7 @@ version = "0.8.2"
 authors = [
     {name = "Luca Marturana", email = "lucamarturana@gmail.com"},
 ]
-license = {text = "GPL-2"}
+license = {text = "GPL-2.0-or-later"}
 description = "Curses based utility to view elogs created by Portage"
 dependencies = ["portage"]
 
