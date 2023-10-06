@@ -2,3 +2,7 @@
 cf01cb49e14730c2323da4ef9f8093935ef93fb9
 # Reformat project with isort
 c08fea8ad853d1508b412f06dd9636273912f1c1
+# pre-commit: Mass-apply end-of-file-fixer
+1c9eb420a0305c9aab435b161475b1db9508963b
+# pre-commit: Mass-apply trailing-whitespace
+b5e0a6f4f6ae76bd269b22ac3683d8c35c3e8436
