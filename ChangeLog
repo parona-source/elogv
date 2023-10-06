@@ -59,7 +59,7 @@
 	* elogv: fixed bug #249536 on Gentoo Bugzilla, there was a problem when
 	using the dd command, thanks to Arnaud Lech <arnaud@bdefracte.org> for the
 	patch
-    
+
 2008-11-01 Luca Marturana (luca89) <lucamarturana@gmail.com>
 	* elogv: fixed bug #236056 on Gentoo Bugzilla, now elogv works fine even
 	if the terminal has a black background
@@ -94,9 +94,9 @@
 	list of files can be ordered by class warning level
 	* setup.py: Added support to install *.po files and localized manpages
 
-2008-03-21 Luca Marturana (luca89) <lucamarturana@gmail.com> 
-	* elogv: Fixed bug #214063 on Gentoo Bugzilla, thanks to Michał Kiedrowicz 
-	<esqualante@o2.pl> 
+2008-03-21 Luca Marturana (luca89) <lucamarturana@gmail.com>
+	* elogv: Fixed bug #214063 on Gentoo Bugzilla, thanks to Michał Kiedrowicz
+	<esqualante@o2.pl>
 
 2008-03-05 Luca Marturana (luca89) <lucamarturana@gmail.com>
 	* elogv: Tagging files with the alarm level, thanks to
