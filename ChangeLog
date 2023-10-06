@@ -1,10 +1,16 @@
 # ChangeLog for elogv
 
+0.8.3
+  * Support variable PORTAGE_LOGDIR (#21)
+  * Correct/clarify code license to be "GPL v2 or later" in packaging (#19)
+  * Start using GitHub Actions and pre-commit for CI (#18)
+  * Start using QA tools black, isort, ruff (#16)
+
 0.8.2
-  * Fix decompression and port to standard library lzma
+  * Fix decompression and port to standard library lzma (#15)
 
 0.8.1
-  * Port to setuptools and PEP517 (Gentoo bug #841134)
+  * Port to setuptools and PEP517 (#14, Gentoo bug #841134)
 
 0.8.0
   * Set "packages=[]" in setup.py to fix the build
