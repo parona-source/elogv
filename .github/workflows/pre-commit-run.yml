@@ -1,0 +1,58 @@
+# This file is part of elogv
+#
+# Authors (in chronological order):
+#  - Sebastian Pipping (sping) <sebastian@pipping.org>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+name: Run pre-commit on all files
+
+on:
+- pull_request
+- push
+- workflow_dispatch
+
+# Minimum permissions for security
+permissions:
+  contents: read
+
+jobs:
+  run_pre_commit:
+    name: Run pre-commit on all files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608  # v4.1.0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236  # v4.7.1
+        with:
+          python-version: 3.12
+
+      - name: Install pre-commit
+        run: |-
+          pip install \
+            --disable-pip-version-check \
+            --user \
+            --no-warn-script-location \
+            pre-commit
+          echo "PATH=${HOME}/.local/bin:${PATH}" >> "${GITHUB_ENV}"
+
+      - name: Install pre-commit hooks
+        run: |-
+          pre-commit install --install-hooks
+
+      - name: Run pre-commit on all files
+        run: |-
+          pre-commit run --all-files --show-diff-on-failure
