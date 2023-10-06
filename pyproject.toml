@@ -14,3 +14,16 @@ dependencies = ["portage"]
 
 [project.urls]
 homepage = "https://gitweb.gentoo.org/proj/elogv.git/"
+
+[tool.black]
+include = "(elogv|setup.py)"
+extend_exclude = "(man|po|.*.egg-info)"
+
+[tool.isort]
+profile = "black"
+src_paths = ["elogv"]
+
+[tool.ruff]
+include = ["elogv", "setup.py"]
+# Ignore long line violations
+ignore = ["E501"]

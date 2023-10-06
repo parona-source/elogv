@@ -20,48 +20,57 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-import os
-import sys
-import re
-from datetime import datetime
+import bz2
 import curses
 import curses.ascii
-import textwrap
-from portage import settings as port_settings
-from glob import glob
 import gettext
-import locale
 import gzip
-import bz2
+import locale
 import lzma
+import os
+import re
 import signal
+import sys
+import textwrap
+from datetime import datetime
+from glob import glob
+
+from portage import settings as port_settings
 
 _LOCALE_CATEGORY_PAIRS = (
-		(locale.LC_COLLATE, 'LC_COLLATE'),
-		(locale.LC_CTYPE, 'LC_CTYPE'),
-		(locale.LC_MESSAGES, 'LC_MESSAGES'),
-		(locale.LC_MONETARY, 'LC_MONETARY'),
-		(locale.LC_NUMERIC, 'LC_NUMERIC'),
-		(locale.LC_TIME, 'LC_TIME'),
-
-		(locale.LC_ALL, 'LC_ALL'),
+    (locale.LC_COLLATE, "LC_COLLATE"),
+    (locale.LC_CTYPE, "LC_CTYPE"),
+    (locale.LC_MESSAGES, "LC_MESSAGES"),
+    (locale.LC_MONETARY, "LC_MONETARY"),
+    (locale.LC_NUMERIC, "LC_NUMERIC"),
+    (locale.LC_TIME, "LC_TIME"),
+    (locale.LC_ALL, "LC_ALL"),
 )
 
 
 def report_bad_locale(variable, value):
-    py_version = '%s.%s.%s' % sys.version_info[:3]
+    py_version = "%s.%s.%s" % sys.version_info[:3]
     print('ERROR: Locale "%s" does not seem to be supported.' % value, file=sys.stderr)
     if value not in locale.locale_alias:
-        print('  Note: Locale "%s" is not a known alias to Python %s (check locale.locale_alias).' % (value, py_version), file=sys.stderr)
-    if not ('.' in value or '@' in value):
-        print('  Hint: Try specifying the encoding (e.g. %s=%s.UTF-8).' % (variable, value), file=sys.stderr)
+        print(
+            '  Note: Locale "%s" is not a known alias to Python %s (check locale.locale_alias).'
+            % (value, py_version),
+            file=sys.stderr,
+        )
+    if not ("." in value or "@" in value):
+        print(
+            "  Hint: Try specifying the encoding (e.g. %s=%s.UTF-8)."
+            % (variable, value),
+            file=sys.stderr,
+        )
+
 
 reported_bad_locales = set()
 
 
 # Enable support for user locale
 try:
-    locale.setlocale(locale.LC_ALL, '')
+    locale.setlocale(locale.LC_ALL, "")
 except locale.Error:
     # Find guilty value and variable
     for category, variable in _LOCALE_CATEGORY_PAIRS:
@@ -83,7 +92,7 @@ for category, variable in _LOCALE_CATEGORY_PAIRS:
 
     try:
         locale.getlocale(category)
-    except ValueError as e:
+    except ValueError:
         value = os.environ[variable]
         if value in reported_bad_locales:
             continue
@@ -95,11 +104,12 @@ if reported_bad_locales:
 
 
 # Setup gettext.
-gettext.textdomain('elogv')
+gettext.textdomain("elogv")
 _ = gettext.gettext
 
 # This text is used on the in-line help
-helptext = _("""
+helptext = _(
+    """
 Elogv is a portage elog viewer based on curses and python,
 you can use these keys to control the behavior of the program:
 
@@ -127,7 +137,8 @@ you can use these keys to control the behavior of the program:
  - / -> starts a search prompt, write a string and will be showed the next
         package that contains your string, use ESC to exit
  - q -> quit
-""")
+"""
+)
 
 (normal, selected, einfo, elog, ewarn, eerror) = range(6)
 (PATH, CAT, PN, DATE, CLASS) = range(5)
@@ -136,6 +147,7 @@ you can use these keys to control the behavior of the program:
 class_char = "*"
 list_format = "%s/%s - %s"
 date_format = "%x"
+
 
 # Exceptions classes
 class TermTooSmall(Exception):
@@ -165,11 +177,11 @@ def date2str(d):
     b = d.strftime(date_format)
 
     for encoding in (
-            locale.getlocale(locale.LC_TIME)[1],
-            locale.getlocale()[1],
-            sys.getdefaultencoding(),
-            'utf-8',
-            ):
+        locale.getlocale(locale.LC_TIME)[1],
+        locale.getlocale()[1],
+        sys.getdefaultencoding(),
+        "utf-8",
+    ):
         if encoding is None:
             continue
 
@@ -182,24 +194,25 @@ def date2str(d):
         except UnicodeDecodeError:
             pass
     else:
-        raise ValueError('Cannot decode byte stream')
+        raise ValueError("Cannot decode byte stream")
 
     try:
         if not isinstance(b, str):
-            b = u.encode('ascii')
+            b = u.encode("ascii")
         else:
             b = u
     except UnicodeEncodeError:
         # Prevent crash locales like ja_JP.UTF-8, e.g. "2014年10月24日"
         # https://bugs.gentoo.org/show_bug.cgi?id=464962
-        b = u.encode('ascii', errors='replace')
+        b = u.encode("ascii", errors="replace")
 
     return b
+
 
 # Main class (called with curses.wrapper later)
 class ElogViewer:
     def __init__(self, screen):
-        #curses.curs_set(0)
+        # curses.curs_set(0)
         self.screen = screen
 
         # Our color pairs
@@ -214,20 +227,20 @@ class ElogViewer:
             pass
 
         # This attributes are used to manage the scrolling of the list
-        # of files    
+        # of files
         self.pposy = 0
         self.usel = 0
 
         # Method used to order the list: use DATE for order by date, CAT to
         # order by category name, PN to order by package name, CLASS to order
         # by class second value set if the list should be reversed (True o False)
-        self.sort_method = [ DATE, False]
+        self.sort_method = [DATE, False]
 
         # Initialize screen
         self.init_screen()
 
         c = self.screen.getch()
-        while c not in ( ord("q"), curses.ascii.ESC):
+        while c not in (ord("q"), curses.ascii.ESC):
             ## Scrolling keys ##
             if c in (curses.KEY_DOWN, ord("j")):
                 self.change_usel(1)
@@ -237,12 +250,12 @@ class ElogViewer:
 
             elif c in (curses.KEY_NPAGE, ord("f")):
                 self.change_usel(10)
-                
+
             elif c in (curses.KEY_PPAGE, ord("b")):
                 self.change_usel(-10)
 
             elif c in (curses.KEY_END, ord("G")):
-                self.change_usel(len(self.packages)-1, False)
+                self.change_usel(len(self.packages) - 1, False)
 
             elif c in (curses.KEY_HOME, ord("g")):
                 self.change_usel(0, False)
@@ -317,12 +330,12 @@ class ElogViewer:
 
             elif c == ord("/"):
                 word = ""
-                self.screen.move(self.height-1,2)
+                self.screen.move(self.height - 1, 2)
                 self.screen.addstr("/")
                 subc = self.screen.getch()
                 while subc != curses.ascii.ESC:
                     if subc == ord("\n"):
-                        self.search(word,1)
+                        self.search(word, 1)
                     elif subc == curses.ascii.BS:
                         word = word[:-1]
                         self.screen.delch()
@@ -330,10 +343,10 @@ class ElogViewer:
                     elif curses.ascii.isalpha(subc):
                         word += chr(subc)
                         self.screen.addstr(chr(subc))
-                        self.search(word)  
+                        self.search(word)
                     subc = self.screen.getch()
-                self.screen.hline(self.height-1,2,curses.ACS_HLINE,(len(word)+1))
-                self.screen.addstr(self.height-2,2," "*20)
+                self.screen.hline(self.height - 1, 2, curses.ACS_HLINE, (len(word) + 1))
+                self.screen.addstr(self.height - 2, 2, " " * 20)
 
             # Get another key from the user
             c = self.screen.getch()
@@ -351,14 +364,15 @@ class ElogViewer:
 
         # Screen Look&Feel
         self.screen.border()
-        self.screen.hline(self.height//2,1, "_", self.width-2)
+        self.screen.hline(self.height // 2, 1, "_", self.width - 2)
         m = _(" Press F1 or h to show the help screen ")
-        self.screen.addstr(self.height-1, self.width-len(m)-1, m)
+        self.screen.addstr(self.height - 1, self.width - len(m) - 1, m)
         self.screen.refresh()
 
         # Initialize log file window
-        self.log_win = curses.newwin(self.height//2-2, self.width-2,
-                                     self.height//2+1, 1)
+        self.log_win = curses.newwin(
+            self.height // 2 - 2, self.width - 2, self.height // 2 + 1, 1
+        )
 
         # Draw other window of the screen
         self.fill_file_pad()
@@ -367,31 +381,37 @@ class ElogViewer:
         self.logf_wrap = self.wrap_logf_lines()
         self.show_log()
 
-    def change_usel(self,n,relative=True):
+    def change_usel(self, n, relative=True):
         prev_usel = self.usel
         if not relative:
             self.usel = n
-        elif n < 0 and self.usel+n < 0:
+        elif n < 0 and self.usel + n < 0:
             self.usel = 0
-        elif n > 0 and self.usel+n > len(self.packages)-1:
-            self.usel = len(self.packages)-1
+        elif n > 0 and self.usel + n > len(self.packages) - 1:
+            self.usel = len(self.packages) - 1
         else:
             self.usel += n
 
         prev_pkg = self.packages[prev_usel]
         pkg = self.packages[self.usel]
-        self.file_pad.addstr(prev_usel,1,
-                                 class_char,
-                                 curses.A_BOLD + curses.color_pair(prev_pkg[CLASS]))
-        self.file_pad.addstr(prev_usel,3,
-                                 list_format % (prev_pkg[CAT], prev_pkg[PN], date2str(prev_pkg[DATE]) ),
-                                 curses.color_pair(normal))
-        self.file_pad.addstr(self.usel,1,
-                                 class_char,
-                                 curses.A_BOLD + curses.color_pair(pkg[CLASS]))
-        self.file_pad.addstr(self.usel,3,
-                                 list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE]) ),
-                                 curses.color_pair(selected))
+        self.file_pad.addstr(
+            prev_usel, 1, class_char, curses.A_BOLD + curses.color_pair(prev_pkg[CLASS])
+        )
+        self.file_pad.addstr(
+            prev_usel,
+            3,
+            list_format % (prev_pkg[CAT], prev_pkg[PN], date2str(prev_pkg[DATE])),
+            curses.color_pair(normal),
+        )
+        self.file_pad.addstr(
+            self.usel, 1, class_char, curses.A_BOLD + curses.color_pair(pkg[CLASS])
+        )
+        self.file_pad.addstr(
+            self.usel,
+            3,
+            list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE])),
+            curses.color_pair(selected),
+        )
 
         first = self.pposy
         last = (self.height // 2 - 2) + first
@@ -414,12 +434,12 @@ class ElogViewer:
         self.show_log()
 
     @staticmethod
-    def open(file, mode='rt'):
-        if file.endswith('.xz'):
+    def open(file, mode="rt"):
+        if file.endswith(".xz"):
             return lzma.open(file, mode=mode)
-        elif file.endswith('.gz'):
+        elif file.endswith(".gz"):
             return gzip.open(file, mode=mode)
-        elif file.endswith('.bz2'):
+        elif file.endswith(".bz2"):
             return bz2.open(file, mode=mode)
         else:
             return open(file, mode=mode)
@@ -432,7 +452,7 @@ class ElogViewer:
         Redraws file pad, first half of the screen.
         Can be used to scroll or simply update
         """
-        self.file_pad.refresh(self.pposy,0,1,1,self.height//2-1,self.width-2)
+        self.file_pad.refresh(self.pposy, 0, 1, 1, self.height // 2 - 1, self.width - 2)
 
     def get_packages_key(self, k):
         return k[self.sort_method[0]]
@@ -444,7 +464,9 @@ class ElogViewer:
         """
         # Get the list of files
         try:
-            file_list = glob(os.path.join(elogdir,"*:*:*.log*")) + glob(os.path.join(elogdir,"*","*:*.log*"))
+            file_list = glob(os.path.join(elogdir, "*:*:*.log*")) + glob(
+                os.path.join(elogdir, "*", "*:*.log*")
+            )
         except OSError:
             raise CannotOpenElogdir()
 
@@ -465,13 +487,15 @@ class ElogViewer:
             # then we split the string using as pattern / or : to obtain in any
             # case
             # ( "x11-themes", "haematite-xcursors", "1.0:20091018-195827.log")
-            tmpfilepath = re.sub('\\.log[^/]*$', '.log', filepath)
-            split_up = re.split(":|" + os.path.sep, tmpfilepath.replace(elogdir + os.path.sep, ""))
+            tmpfilepath = re.sub("\\.log[^/]*$", ".log", filepath)
+            split_up = re.split(
+                ":|" + os.path.sep, tmpfilepath.replace(elogdir + os.path.sep, "")
+            )
             if len(split_up) < 3:
                 continue
             (cat, pn, other) = split_up[-3:]
             date = datetime.strptime(other, "%Y%m%d-%H%M%S.log")
-            self.packages.append( (filepath, cat, pn, date, self.get_class(filepath)) )
+            self.packages.append((filepath, cat, pn, date, self.get_class(filepath)))
 
         if not self.packages:
             raise NoLogFiles()
@@ -479,24 +503,26 @@ class ElogViewer:
         # Maybe that after removing files self.usel points to a wrong index,
         # so this will prevent a crash
         if self.usel >= len(self.packages):
-            self.usel = len(self.packages)-1
+            self.usel = len(self.packages) - 1
             # We also have to update self.pposy
             if self.pposy > self.usel:
-                self.pposy = max(0, self.usel-10)
+                self.pposy = max(0, self.usel - 10)
 
         # Sort the list
         if self.sort_method[0] in (DATE, CLASS):
-            self.packages.sort(key=self.get_packages_key,reverse=not self.sort_method[1])
+            self.packages.sort(
+                key=self.get_packages_key, reverse=not self.sort_method[1]
+            )
         else:
             self.packages.sort(key=self.get_packages_key, reverse=self.sort_method[1])
 
         # Curses' newpad fails for nlines >32767 so we truncate the list
         # of log files to not exceed that limit (issue #10)
-        MAX_ENTRIES = 2 ** 15 - 1
+        MAX_ENTRIES = 2**15 - 1
         if len(self.packages) > MAX_ENTRIES:
             self.packages = self.packages[:MAX_ENTRIES]
 
-        self.file_pad = curses.newpad(len(self.packages),self.width)
+        self.file_pad = curses.newpad(len(self.packages), self.width)
         self.file_pad.erase()
 
         for i, pkg in enumerate(self.packages):
@@ -513,14 +539,17 @@ class ElogViewer:
             else:
                 cp = normal
 
-            self.file_pad.addstr(i,1,
-                                 class_char,
-                                 curses.A_BOLD + curses.color_pair(pkg[CLASS]))
-            self.file_pad.addstr(i,3,
-                                 list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE]) ),
-                                 curses.color_pair(cp))
+            self.file_pad.addstr(
+                i, 1, class_char, curses.A_BOLD + curses.color_pair(pkg[CLASS])
+            )
+            self.file_pad.addstr(
+                i,
+                3,
+                list_format % (pkg[CAT], pkg[PN], date2str(pkg[DATE])),
+                curses.color_pair(cp),
+            )
 
-    def get_class(self,filepath):
+    def get_class(self, filepath):
         """
         Get the highest elog class in a file
         """
@@ -540,7 +569,6 @@ class ElogViewer:
         """
         Takes a file-like object and wraps long lines. Returns a list iterator.
         """
-        result = []
         self.logf.seek(0)
         for line in self.logf.readlines():
             if not line.strip():
@@ -548,9 +576,9 @@ class ElogViewer:
                 yield "\n"
             else:
                 # Returns a list of new lines minus the line ending \n
-                wrapped_line = textwrap.wrap(line, width=self.width-2)
-                for l in wrapped_line:
-                    yield l + "\n"
+                wrapped_lines = textwrap.wrap(line, width=self.width - 2)
+                for output_line in wrapped_lines:
+                    yield output_line + "\n"
 
     def show_log(self):
         """
@@ -561,7 +589,7 @@ class ElogViewer:
         self.log_win.erase()
         shown_all = False
 
-        for i in range(0,self.height//2-4):
+        for i in range(0, self.height // 2 - 4):
             try:
                 x = next(self.logf_wrap)
             except StopIteration:
@@ -571,27 +599,31 @@ class ElogViewer:
                 break
 
             try:
-                if x.startswith('INFO:'):
-                    self.log_win.addstr(x[:self.width-2],curses.color_pair(einfo))
-                elif x.startswith('WARN:'):
-                    self.log_win.addstr(x[:self.width-2],curses.color_pair(ewarn))
-                elif x.startswith('ERROR:'):
-                    self.log_win.addstr(x[:self.width-2],curses.color_pair(eerror))
-                elif x.startswith('LOG:'):
-                    self.log_win.addstr(x[:self.width-2],curses.color_pair(elog))
+                if x.startswith("INFO:"):
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(einfo))
+                elif x.startswith("WARN:"):
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(ewarn))
+                elif x.startswith("ERROR:"):
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(eerror))
+                elif x.startswith("LOG:"):
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(elog))
                 else:
-                    self.log_win.addstr(x[:self.width-2],curses.color_pair(normal))
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(normal))
             except curses.error:
                 pass
 
-        if not shown_all: 
+        if not shown_all:
             s = _("Continue...")
-            self.log_win.addstr(self.height//2-3, self.width-len(s)-4, s,
-                                curses.color_pair(normal))
+            self.log_win.addstr(
+                self.height // 2 - 3,
+                self.width - len(s) - 4,
+                s,
+                curses.color_pair(normal),
+            )
 
         self.log_win.refresh()
 
-    def remove_file(self,n):
+    def remove_file(self, n):
         """
         Delete from the filesystem a slice of elog files
         n can be:
@@ -614,24 +646,25 @@ class ElogViewer:
             end = self.usel + int(n)
 
         for item in self.packages[start:end]:
-            os.remove(os.path.join(elogdir,item[0]))
+            os.remove(os.path.join(elogdir, item[0]))
 
     def show_help(self):
         # Setup help window
         helpwin_height = self.height // 3 * 2
         helpwin_corner = (self.height // 6, self.width // 2 - 40)
-        helpwin = curses.newwin(helpwin_height, 80,
-                                     helpwin_corner[0], helpwin_corner[1])
+        helpwin = curses.newwin(
+            helpwin_height, 80, helpwin_corner[0], helpwin_corner[1]
+        )
         helplines = helptext.splitlines()
 
         # Setup help pad
         row = 0
         maxrow = len(helplines)
-        helppad = curses.newpad(maxrow,80)
+        helppad = curses.newpad(maxrow, 80)
 
         # Insert helptext on the pad
         for i in range(maxrow):
-            helppad.addstr(i,0,helplines[i])
+            helppad.addstr(i, 0, helplines[i])
 
         # Loop to manage user actions
         c = None
@@ -640,31 +673,39 @@ class ElogViewer:
             helpwin.border()
             helpwin.refresh()
 
-            helppad.refresh(row,0,helpwin_corner[0]+1,helpwin_corner[1]+1,
-                             helpwin_height+helpwin_corner[0]-2,80+helpwin_corner[1]-2)
+            helppad.refresh(
+                row,
+                0,
+                helpwin_corner[0] + 1,
+                helpwin_corner[1] + 1,
+                helpwin_height + helpwin_corner[0] - 2,
+                80 + helpwin_corner[1] - 2,
+            )
 
             c = self.screen.getch()
             if c == curses.KEY_NPAGE:
-                if row+10 <= maxrow:
+                if row + 10 <= maxrow:
                     row += 10
             elif c == curses.KEY_PPAGE:
-                if row-10 >= 0:
+                if row - 10 >= 0:
                     row -= 10
             elif c in (curses.KEY_DOWN, ord("j")):
-                if row+1 < maxrow:
+                if row + 1 < maxrow:
                     row += 1
             elif c in (curses.KEY_UP, ord("k")):
                 if row > 0:
                     row -= 1
 
     def search(self, word, div=0):
-        for x in self.packages[self.usel+div:]:
+        for x in self.packages[self.usel + div :]:
             if re.search(word, "%s/%s" % x[1:3]):
-                self.change_usel(self.packages.index(x),False)
+                self.change_usel(self.packages.index(x), False)
                 break
         else:
-            self.screen.addstr(self.height-2,2,_("Not Found!"),
-                curses.color_pair(eerror))
+            self.screen.addstr(
+                self.height - 2, 2, _("Not Found!"), curses.color_pair(eerror)
+            )
+
 
 if __name__ == "__main__":
     if "--help" in sys.argv:
@@ -672,10 +713,12 @@ if __name__ == "__main__":
         sys.exit()
 
     # Get the path of the elogdir
-    if port_settings['PORT_LOGDIR']:
-        elogdir = os.path.join(port_settings['PORT_LOGDIR'],"elog")
+    if port_settings["PORT_LOGDIR"]:
+        elogdir = os.path.join(port_settings["PORT_LOGDIR"], "elog")
     else:
-        elogdir = os.path.join(os.sep,port_settings['EPREFIX'],"var","log","portage","elog")
+        elogdir = os.path.join(
+            os.sep, port_settings["EPREFIX"], "var", "log", "portage", "elog"
+        )
 
     signal.signal(signal.SIGTSTP, handle_sig_tstp)
     signal.signal(signal.SIGCONT, handle_sig_cont)
@@ -691,7 +734,9 @@ if __name__ == "__main__":
         sys.exit(1)
     except CannotOpenElogdir:
         print(_("Cannot open"), elogdir)
-        print(_("Please check if the directory exists and if it's readable by your user."))
+        print(
+            _("Please check if the directory exists and if it's readable by your user.")
+        )
         sys.exit(1)
     except KeyboardInterrupt:
         pass
