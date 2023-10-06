@@ -102,4 +102,3 @@ msgstr "Imposible abrir"
 #: ../elogv:528
 msgid "Please check if the directory exists and if it's readable by your user."
 msgstr "Por favor, compruebe si el directorio existe y si es legible por su usuario."
-

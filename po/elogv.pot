@@ -74,4 +74,3 @@ msgstr ""
 #: ../elogv:528
 msgid "Please check if the directory exists and if it's readable by your user."
 msgstr ""
-
