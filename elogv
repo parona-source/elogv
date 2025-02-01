@@ -610,6 +610,8 @@ class ElogViewer:
                     self.log_win.addstr(x[: self.width - 2], curses.color_pair(eerror))
                 elif x.startswith("LOG:"):
                     self.log_win.addstr(x[: self.width - 2], curses.color_pair(elog))
+                elif x.startswith("QA:"):
+                    self.log_win.addstr(x[: self.width - 2], curses.color_pair(einfo))
                 else:
                     # Strip embedded color codes
                     x = re.sub(ansi_code, "", x)
